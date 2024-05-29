@@ -8,7 +8,7 @@ const char lightmap[] = {' ', '0'};
 void get_screen_size(int* p_screen);
 void draw_cube_vertices(int* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z);
 void test_vertex_render(int terminal_x, int terminal_y, int cube_vertices[8][3]);
-void rotate_vertices(double angle, int cube_vertices[8][3]);
+void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z);
 
 
 int main(void)
@@ -55,7 +55,11 @@ int main(void)
 		std::cout << "} \n";
 	}
 
+	// tests
 	test_vertex_render(terminal_x, terminal_y, cube_vertices);
+	
+	double rotation = M_PI / 10;
+	rotate_vertices(rotation, cube_vertices, p_cube_vertices, terminal_x, terminal_y, terminal_z);
 
 	return 0;
 }
@@ -200,7 +204,7 @@ void test_vertex_render(int terminal_x, int terminal_y, int cube_vertices[8][3])
 }
 
 
-void rotate_vertices(double angle, int cube_vertices[8][3])
+void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z)
 {
 	/* 
 	   we're gonna want to give it a roll, pitch and yaw (rotate on all three axies)
@@ -212,4 +216,57 @@ void rotate_vertices(double angle, int cube_vertices[8][3])
 	   2) or we can try and find a rotation matrix that does it around an arbitrary axis lol
 	*/
 
+	// 30/5/2024 (3:51 am) - method 1 seems easier and maybe it doesn't seem all that hacky, might as well try it.
+
+	int centre_x = terminal_x / 2;
+	int centre_y = terminal_y / 2;
+	int centre_z = terminal_z / 2;
+	
+	// translate vertices to a cube with the origin at its centre
+	int cube_vertices_remap[8][3]; 
+
+	for (int vertex = 0; vertex < 8; vertex++)
+	{
+		for (int coord = 0; coord < 3; coord++)
+		{
+			if (coord == 0)
+			{
+				cube_vertices_remap[vertex][coord] = cube_vertices[vertex][coord] - centre_x;
+			} else if (coord == 1) {
+				cube_vertices_remap[vertex][coord] = cube_vertices[vertex][coord] - centre_y;
+			} else {
+				cube_vertices_remap[vertex][coord] = cube_vertices[vertex][coord] - centre_z;
+			}
+			std::cout << cube_vertices_remap[vertex][coord] << '\n';
+		}
+	}
+
+	// apply rotation matrices
+	/*
+		rotate on x-axis:
+		{
+			{1,	0,	0	},
+			{0,	cos(a),	-sin(a)	},
+			{0,	sin(a), cos(a)	}
+		}
+
+		rotate on y-axis:
+		{
+			{cos(b),	0,	sin(b)	},
+			{0,		1,	0	},
+			{-sin(b),	0,	cos(b)	}
+		}
+
+		rotate on z-axis:
+		{
+			{cos(c),	-sin(c),	0},
+			{sin(c),	cos(c), 	0},
+			{0,		0,		1}
+		}
+		
+	 */
+
+	// translate back to original centre point
+
+	// write to coordinate pointer
 }
