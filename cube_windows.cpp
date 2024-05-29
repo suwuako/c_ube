@@ -10,6 +10,21 @@ void draw_cube_vertices(int* p_cube_vertices, int len_to_vertex, int terminal_x,
 void test_vertex_render(int terminal_x, int terminal_y, int cube_vertices[8][3]);
 void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z);
 
+struct point 
+{
+	int x;
+	int y;
+	int z;
+};
+
+struct rotation_matrix
+{
+	double row_1[3];
+	double row_2[3];
+	double row_3[3];
+};
+
+point rotate_vertex(rotation_matrix matrix, point);
 
 int main(void)
 {
@@ -237,7 +252,6 @@ void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices
 			} else {
 				cube_vertices_remap[vertex][coord] = cube_vertices[vertex][coord] - centre_z;
 			}
-			std::cout << cube_vertices_remap[vertex][coord] << '\n';
 		}
 	}
 
@@ -265,7 +279,37 @@ void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices
 		}
 		
 	 */
+	double angle_x;
+	double angle_y;
+	double angle_z;
 
+	double x_array[3][3] =
+		{
+			{1,	0,		0},
+			{0,	cos(angle_x),	-sin(angle_x)},
+			{0,	sin(angle_x),	cos(angle_x)}
+		};
+
+	double y_array[3][3] = 
+		{
+			{cos(angle_y),	0,	sin(angle_y)	},
+			{0,		1,	0	},
+			{-sin(angle_y),	0,	cos(angle_y)	}
+		};
+
+	double z_array[3][3] = 
+		{
+			{cos(angle_z),	-sin(angle_z),	0},
+			{sin(angle_z),	cos(angle_z), 	0},
+			{0,		0,		1}
+		};
+
+
+	rotation_matrix x_rotation;
+	rotation_matrix y_rotation;
+	rotation_matrix z_rotation;
+
+	
 	// translate back to original centre point
 
 	// write to coordinate pointer
