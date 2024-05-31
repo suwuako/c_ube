@@ -1,30 +1,24 @@
 #include <iostream>
 #include <cmath>
 #include <windows.h>
+#include <chrono>
+#include <thread>
 
-const int len_to_vertex = 10;
+const int len_to_vertex = 20;
 const char lightmap[] = {' ', '0'};
+const double rotation_angle = M_PI / 100;
+const double rotation_increment = M_PI / 100;
+
+const bool rotate_x = false;
+const bool rotate_y = true;
+const bool rotate_z = true;
 
 void get_screen_size(int* p_screen);
-void draw_cube_vertices(int* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z);
-void test_vertex_render(int terminal_x, int terminal_y, int cube_vertices[8][3]);
-void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z);
-
-struct point 
-{
-	int x;
-	int y;
-	int z;
-};
-
-struct rotation_matrix
-{
-	double row_1[3];
-	double row_2[3];
-	double row_3[3];
-};
-
-point rotate_vertex(rotation_matrix matrix, point);
+void draw_cube_vertices(double* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z);
+void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][3]);
+void rotate_vertices(double angle, double cube_vertices[8][3], double* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z);
+void multiply_rotation_matrices(double* matrix, double* coord);
+void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertices, double cube_vertices[8][3]);
 
 int main(void)
 {
@@ -53,29 +47,16 @@ int main(void)
 			  ...
 		}
 	*/
-	int cube_vertices[8][3];
-	int* p_cube_vertices = &cube_vertices[0][0];
+	double cube_vertices[8][3];
+	double* p_cube_vertices = &cube_vertices[0][0];
 
 	draw_cube_vertices(p_cube_vertices, len_to_vertex, terminal_x, terminal_y, terminal_z);
 	
 	std::cout << "successfully drew vertexes! \n";
 
-	for (int vertex = 0; vertex < 8; vertex++)
-	{
-		std::cout << "{";
-		for (int coord = 0; coord < 3; coord++)
-		{
-			std::cout << cube_vertices[vertex][coord] << ' ';
-		}
-		std::cout << "} \n";
-	}
-
 	// tests
-	test_vertex_render(terminal_x, terminal_y, cube_vertices);
+	loop(terminal_x, terminal_y, terminal_z, p_cube_vertices, cube_vertices);
 	
-	double rotation = M_PI / 10;
-	rotate_vertices(rotation, cube_vertices, p_cube_vertices, terminal_x, terminal_y, terminal_z);
-
 	return 0;
 }
 
@@ -99,7 +80,7 @@ void get_screen_size(int* p_screen)
 }
 
 
-void draw_cube_vertices(int* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z)
+void draw_cube_vertices(double* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z)
 {
 	/*
 		I'm using a weird hacky way to draw the vertices - it probably would be better to use some form of matrix multiplication but its done this way:
@@ -108,14 +89,14 @@ void draw_cube_vertices(int* p_cube_vertices, int len_to_vertex, int terminal_x,
 		pythag_len from all three x, y and z centres and then we increment to 001, meaning we subract from x and y but add to z. iterating will yield us
 		the pattern 000, 001, 010, 011, 100, 101, 110, 111 which are our 8 vertices!
 	*/
-	int centre_x = terminal_x / 2;
-	int centre_y = terminal_y / 2;
-	int centre_z = terminal_z / 2;
+	double centre_x = terminal_x / 2;
+	double centre_y = terminal_y / 2;
+	double centre_z = terminal_z / 2;
 
 	// this is the system where the offsets are used - we start with {0,0,0}
 	int offset_system[3] = {0, 0, 0};
 
-	int pythag_len = sqrt((pow(len_to_vertex, 2)) / 3);
+	double pythag_len = sqrt((pow(len_to_vertex, 2)) / 3);
 
 	std::cout << "Center of 3d plane : {" << centre_x << ", " << centre_y << ", " << centre_z << "} \n";
 	std::cout << "Length from centre of vertex : " << len_to_vertex << '\n';
@@ -192,24 +173,30 @@ void draw_cube_vertices(int* p_cube_vertices, int len_to_vertex, int terminal_x,
 }
 
 
-void test_vertex_render(int terminal_x, int terminal_y, int cube_vertices[8][3])
+void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][3])
 {
 	// test render
+
+	/*
+		made the mistake of storing coordinates and vertices as ints instead of doubles - causing it to round down... will probably have to write code here that
+		turns the double into int!
+	   */
+
 	for (int x = 0; x < terminal_x; x++)
 	{
 		for (int y = 0; y < terminal_y; y++)
 		{
-			bool pixel_unrendered = false;
+			bool pixel_unrendered = true;
 			for (int vertex = 0; vertex < 8; vertex++)
 			{
-				if (cube_vertices[vertex][0] == x && cube_vertices[vertex][1] == y)
+				if ((int) cube_vertices[vertex][0] == x && (int) cube_vertices[vertex][1] == y)
 				{
 					std::cout << '0';
-					pixel_unrendered = true;
+					pixel_unrendered = false;
 				}
 			}
 
-			if (!pixel_unrendered)
+			if (pixel_unrendered)
 			{
 				std::cout << ' ';
 			}
@@ -219,7 +206,7 @@ void test_vertex_render(int terminal_x, int terminal_y, int cube_vertices[8][3])
 }
 
 
-void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z)
+void rotate_vertices(double angle, double cube_vertices[8][3], double* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z)
 {
 	/* 
 	   we're gonna want to give it a roll, pitch and yaw (rotate on all three axies)
@@ -233,12 +220,12 @@ void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices
 
 	// 30/5/2024 (3:51 am) - method 1 seems easier and maybe it doesn't seem all that hacky, might as well try it.
 
-	int centre_x = terminal_x / 2;
-	int centre_y = terminal_y / 2;
-	int centre_z = terminal_z / 2;
+	double centre_x = terminal_x / 2;
+	double centre_y = terminal_y / 2;
+	double centre_z = terminal_z / 2;
 	
 	// translate vertices to a cube with the origin at its centre
-	int cube_vertices_remap[8][3]; 
+	double cube_vertices_remap[8][3]; 
 
 	for (int vertex = 0; vertex < 8; vertex++)
 	{
@@ -279,9 +266,9 @@ void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices
 		}
 		
 	 */
-	double angle_x;
-	double angle_y;
-	double angle_z;
+	double angle_x = angle;
+	double angle_y = angle;
+	double angle_z = angle;
 
 	double x_array[3][3] =
 		{
@@ -304,13 +291,113 @@ void rotate_vertices(double angle, int cube_vertices[8][3], int* p_cube_vertices
 			{0,		0,		1}
 		};
 
+	
+	for (int vertex = 0; vertex < 8; vertex++)
+	{
+		// flags at beginning for customisation if we want certain rotations or not
+		if (rotate_x)
+		{
+			multiply_rotation_matrices(&x_array[0][0], &cube_vertices_remap[vertex][0]);
+		}
+		
+		if(rotate_y)
+		{
+			multiply_rotation_matrices(&y_array[0][0], &cube_vertices_remap[vertex][0]);
+		}
+		
+		if (rotate_z)
+		{
+			multiply_rotation_matrices(&z_array[0][0], &cube_vertices_remap[vertex][0]);
+		}
+		
 
-	rotation_matrix x_rotation;
-	rotation_matrix y_rotation;
-	rotation_matrix z_rotation;
+		for (int j = 0; j < 3; j++)
+		{
+			std::cout << cube_vertices_remap[vertex][j] << ' ';
+		}
+		std::cout << '\n';
+	}
 
 	
 	// translate back to original centre point
+	// kinda hacky i just recopied the code lol maybe i should use a function for transforming coordinates too...
+	for (int vertex = 0; vertex < 8; vertex++)
+	{
+		for (int coord = 0; coord < 3; coord++)
+		{
+			if (coord == 0)
+			{
+				cube_vertices_remap[vertex][coord] +=  centre_x;
+			} else if (coord == 1) {
+				cube_vertices_remap[vertex][coord] += centre_y;
+			} else {
+				cube_vertices_remap[vertex][coord] += centre_z;
+			}
+		}
+	}
 
 	// write to coordinate pointer
+	// lots of for loops here can probably simplify it down
+	for (int vertex = 0; vertex < 8; vertex++)
+	{
+		for (int coord = 0; coord < 3; coord++)
+		{	
+			*(p_cube_vertices + coord + 3 * vertex) = cube_vertices_remap[vertex][coord];
+		}
+	}
+}
+
+void multiply_rotation_matrices(double* matrix, double* coord)
+{
+	// apply arrays to local scope
+	double rotation_matrix[3][3];
+	double rotation_coord[3];
+	double new_coord[3];
+
+
+	for (int i = 0; i < 3; i++)
+	{
+		rotation_coord[i] = *(coord + i);
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{	
+			rotation_matrix[i][j] = *(matrix + 3*i + j);
+		}
+	}
+
+	// rotation matrices work by having the rotation matrix multiply by coordinate 
+	for (int i = 0; i < 3; i++)
+	{
+		double sum{0};
+		for (int j = 0; j < 3; j++)
+		{
+			sum += rotation_matrix[i][j] * rotation_coord[j];
+		}
+		new_coord[i] = sum;
+	}
+	
+	// rewrite coordinate to p_coord
+	for (int i = 0; i < 3; i++)
+	{
+		*(coord + i) = new_coord[i];
+	}
+}
+
+void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertices, double cube_vertices[8][3])
+{
+	test_vertex_render(terminal_x, terminal_y, cube_vertices);
+
+	double rotation = rotation_angle;
+	
+	while (true)
+	{
+		rotate_vertices(rotation, cube_vertices, p_cube_vertices, terminal_x, terminal_y, terminal_z);
+
+		test_vertex_render(terminal_x, terminal_y, cube_vertices);
+		rotation += rotation_increment;	
+		Sleep(1000);
+	}
 }
