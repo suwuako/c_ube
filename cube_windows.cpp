@@ -13,7 +13,7 @@ const double x_rotation_offset = 0;
 const double y_rotation_offset = 0;
 const double z_rotation_offset = 0;
 
-const bool rotate_x = true;
+const bool rotate_x = false;
 const bool rotate_y = true;
 const bool rotate_z = true;
 
@@ -419,6 +419,7 @@ void multiply_rotation_matrices(double* matrix, double* coord)
 
 void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertices, double cube_vertices[8][3])
 {
+	/*
 	test_vertex_render(terminal_x, terminal_y, cube_vertices);
 
 	double rotation = rotation_angle;
@@ -431,6 +432,18 @@ void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertice
 		rotation += rotation_increment;	
 		Sleep(1000);
 	}
+	*/
+  double rotation = rotation_increment; // rotation_angle;
+
+  while (true)
+  {
+    rotate_vertices(rotation, cube_vertices, p_cube_vertices, terminal_x, terminal_y, terminal_z);
+
+    test_vertex_render(terminal_x, terminal_y, cube_vertices);
+    //rotation += rotation_increment; 
+    //std::cout << "growing rotation by " << rotation_increment << " to get " << rotation << std::endl;
+    Sleep(1000);
+  }
 }
 
 void group_triangles(double cube_vertices[8][3], double* p_triangles)
