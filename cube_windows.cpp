@@ -6,10 +6,14 @@
 
 const int len_to_vertex = 20;
 const char lightmap[] = {' ', '0'};
-const double rotation_angle = M_PI / 100;
-const double rotation_increment = M_PI / 100;
+const double rotation_angle = 0;
+const double rotation_increment = M_PI/100;
 
-const bool rotate_x = false;
+const double x_rotation_offset = 0;
+const double y_rotation_offset = 0;
+const double z_rotation_offset = 0;
+
+const bool rotate_x = true;
 const bool rotate_y = true;
 const bool rotate_z = true;
 
@@ -19,6 +23,7 @@ void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][
 void rotate_vertices(double angle, double cube_vertices[8][3], double* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z);
 void multiply_rotation_matrices(double* matrix, double* coord);
 void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertices, double cube_vertices[8][3]);
+void group_triangles(double cube_vertices[8][3], double* p_triangles);
 
 int main(void)
 {
@@ -37,6 +42,8 @@ int main(void)
 	std::cout << "terminal_y : " << terminal_y << '\n';
 	std::cout << "terminal_z : " << terminal_z << '\n';
 
+	std::cout << "\x1B[31m colour test \033[0m" << '\n';
+
 	// create coordinates for cube vertecies in 3d space
 	/*
 	   	where if *p == 1; *(p+1) == 2 and *(p+2) == 3.
@@ -53,6 +60,26 @@ int main(void)
 	draw_cube_vertices(p_cube_vertices, len_to_vertex, terminal_x, terminal_y, terminal_z);
 	
 	std::cout << "successfully drew vertexes! \n";
+
+	/* 
+		gotta create triangles! triangles will be a collection of 3 coordinates that make up one of the faces of the cube
+		can end up messy since i will be storing triangles inside an array : example :
+		{
+			{
+				{1, 1, 1}, {2, 2, 2}, {3, 3, 3}
+			},
+			{
+				{...}, ... , {...}
+			}
+		}
+		yuck!
+
+		notes: we will always have 6 faces (of a cube), 12 triangles, 8 vertices. 3 vertices makes up a triangles.
+	*/
+	double triangles[12][3][3];
+	double* p_triangles = &triangles[0][0][0];
+
+	group_triangles(cube_vertices, p_triangles);
 
 	// tests
 	loop(terminal_x, terminal_y, terminal_z, p_cube_vertices, cube_vertices);
@@ -182,6 +209,9 @@ void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][
 		turns the double into int!
 	   */
 
+	std::string colours[8] = {"\x1B[31m", "\x1B[32m", "\x1B[33m","\x1B[34m", "\x1B[35m", "\x1B[36m", "\x1B[37m", "\x1B[38m"};
+	int colour_cycle = 0;
+
 	for (int x = 0; x < terminal_x; x++)
 	{
 		for (int y = 0; y < terminal_y; y++)
@@ -191,8 +221,9 @@ void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][
 			{
 				if ((int) cube_vertices[vertex][0] == x && (int) cube_vertices[vertex][1] == y)
 				{
-					std::cout << '0';
+					std::cout << colours[colour_cycle] << "0" << "\033[0m";
 					pixel_unrendered = false;
+					colour_cycle++;
 				}
 			}
 
@@ -266,9 +297,9 @@ void rotate_vertices(double angle, double cube_vertices[8][3], double* p_cube_ve
 		}
 		
 	 */
-	double angle_x = angle;
-	double angle_y = angle;
-	double angle_z = angle;
+	double angle_x = angle + x_rotation_offset;
+	double angle_y = angle + y_rotation_offset;
+	double angle_z = angle + z_rotation_offset;
 
 	double x_array[3][3] =
 		{
@@ -400,4 +431,18 @@ void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertice
 		rotation += rotation_increment;	
 		Sleep(1000);
 	}
+}
+
+void group_triangles(double cube_vertices[8][3], double* p_triangles)
+{
+	/*
+		to start grouping triangles, we pick two random vertices. these two vertices cannot exceed the length of pythag_len (shortest length between two vertices)
+		we then find a vertex that is parallel to the vector created by our first two vertices (using cross product) and also is the length of pythag_len. this will
+		be our three vertices that makes up a triangle. we then take the third and first vertex and do the same, ignoring the second vertex.
+
+		each vertex can only be part of three triangles
+	   */
+
+	double pythag_len = sqrt((pow(len_to_vertex, 2)) / 3);
+
 }
