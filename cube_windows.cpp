@@ -210,7 +210,6 @@ void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][
 	   */
 
 	std::string colours[8] = {"\x1B[31m", "\x1B[32m", "\x1B[33m","\x1B[34m", "\x1B[35m", "\x1B[36m", "\x1B[37m", "\x1B[38m"};
-	int colour_cycle = 0;
 
 	for (int x = 0; x < terminal_x; x++)
 	{
@@ -221,9 +220,8 @@ void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][
 			{
 				if ((int) cube_vertices[vertex][0] == x && (int) cube_vertices[vertex][1] == y)
 				{
-					std::cout << colours[colour_cycle] << "0" << "\033[0m";
+					std::cout << colours[vertex] << "0" << "\033[0m";
 					pixel_unrendered = false;
-					colour_cycle++;
 				}
 			}
 
