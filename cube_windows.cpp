@@ -1,10 +1,17 @@
 #include <iostream>
 #include <cmath>
-#include <windows.h>
 #include <chrono>
 #include <thread>
 
-const int len_to_vertex = 20;
+#ifdef _MSC_VER
+  #include <windows.h>
+#else
+  #include <sys/ioctl.h>
+  #include <termios.h> // maybe don't use this one after all -V
+  #include <unistd.h>
+#endif
+
+const int len_to_vertex = 10;
 const char lightmap[] = {' ', '0'};
 const double rotation_angle = 0;
 const double rotation_increment = M_PI/100;
@@ -95,12 +102,25 @@ void get_screen_size(int* p_screen)
 	int* screen_col = (p_screen + 1);
 
 	// get console width and height
+	int columns = 150, rows = 35;
+#ifdef _MSC_VER
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	int columns, rows;
   
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+#else
+  int demanded_fd = 1;
+  struct winsize size_info;
+  //struct termios attrib_struct;
+  //columns = ioctl(); // tcgetattr(demanded_fd, &attrib_struct);
+  int err_code = ioctl(demanded_fd, TIOCGWINSZ, &size_info); // &columns, &rows); // tcgetattr(demanded_fd, &attrib_struct);
+  if (0 != err_code) {
+    std::cerr << "[WARN] could not execute ioctl call. Using default col/row bounds." << std::endl;
+  }
+  columns = size_info.ws_col;
+  rows = size_info.ws_row;
+#endif
   
 	*screen_row = rows;
 	*screen_col = columns;
@@ -417,20 +437,20 @@ void multiply_rotation_matrices(double* matrix, double* coord)
 
 void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertices, double cube_vertices[8][3])
 {
-	/*
+       /*
 	test_vertex_render(terminal_x, terminal_y, cube_vertices);
 
 	double rotation = rotation_angle;
-	
 	while (true)
 	{
 		rotate_vertices(rotation, cube_vertices, p_cube_vertices, terminal_x, terminal_y, terminal_z);
 
 		test_vertex_render(terminal_x, terminal_y, cube_vertices);
 		rotation += rotation_increment;	
+
 		Sleep(1000);
 	}
-	*/
+       */
   double rotation = rotation_increment; // rotation_angle;
 
   while (true)
@@ -440,7 +460,12 @@ void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertice
     test_vertex_render(terminal_x, terminal_y, cube_vertices);
     //rotation += rotation_increment; 
     //std::cout << "growing rotation by " << rotation_increment << " to get " << rotation << std::endl;
+
+#ifdef _MSC_VER
     Sleep(1000);
+#else
+    sleep(1);
+#endif
   }
 }
 
