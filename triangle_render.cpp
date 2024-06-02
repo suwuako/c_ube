@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <math.h>
 
-const int triangle_offset = 10;
+const int triangle_offset = 5;
 const int triangle_count = 2;
 
 void get_screen_size(int* p_screen)
@@ -139,8 +139,8 @@ bool p_in_triangle(double* vec_PA, double* vec_PB, double* vec_PC, double* vec_A
     double area_PBC = area_2d(vec_BC, vec_BP);
 
     double check = area_PCA + area_PAB + area_PBC;
-        std::cout << check << ' ' << total_area << '\n';
-    if (abs(check - total_area) <= 500)
+
+    if (abs((int) check - (int) total_area) <= 5000)
     {
         return true;
     }
@@ -166,7 +166,8 @@ char return_pixel(int x, int y, double* triangles, int triangle_count, int termi
 	for (int tri = 0; tri < triangle_count; tri++)
 	{
 		assign_coords(tri, triangles, A, B, C);		
-		assign_triangle_vectors(A, B, C, vec_AB, vec_AC, vec_BC);
+        
+        assign_triangle_vectors(A, B, C, vec_AB, vec_AC, vec_BC);
 		assign_p_vectors(A, B, C, P, vec_PA, vec_PB, vec_PC);	
         
         if (p_in_triangle(vec_PA, vec_PB, vec_PC, vec_AB, vec_AC, vec_BC))
