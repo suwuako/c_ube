@@ -84,5 +84,7 @@ void get_screen_size(int* p_screen)
 
 void render_screen(double* triangle_vertices, int terminal_x, int terminal_y, int terminal_z)
 {
-  
+  double centre_x = terminal_x / 2;
+  double centre_y = terminal_y / 2;
+  double centre_z = terminal_z / 2;
 }
