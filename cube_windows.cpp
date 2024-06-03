@@ -30,9 +30,8 @@ int main(void)
 	// set console width & height
 	// p_screen is used as a pointer to store the height and width from a function
 	int screen_size[2];
-	int* p_screen_size = &screen_size[0];
 
-	get_screen_size(p_screen_size);
+	get_screen_size(screen_size);
 
 	int terminal_x = screen_size[0];
 	int terminal_y = screen_size[1];
@@ -55,9 +54,8 @@ int main(void)
 		}
 	*/
 	double cube_vertices[8][3];
-	double* p_cube_vertices = &cube_vertices[0][0];
 
-	draw_cube_vertices(p_cube_vertices, len_to_vertex, terminal_x, terminal_y, terminal_z);
+	draw_cube_vertices(cube_vertices, len_to_vertex, terminal_x, terminal_y, terminal_z);
 	
 	std::cout << "successfully drew vertexes! \n";
 
@@ -77,9 +75,8 @@ int main(void)
 		notes: we will always have 6 faces (of a cube), 12 triangles, 8 vertices. 3 vertices makes up a triangles.
 	*/
 	double triangles[12][3][3];
-	double* p_triangles = &triangles[0][0][0];
 
-	group_triangles(cube_vertices, p_triangles);
+	group_triangles(cube_vertices, triangles);
 
 	// tests
 	loop(terminal_x, terminal_y, terminal_z, p_cube_vertices, cube_vertices);
