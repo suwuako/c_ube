@@ -79,7 +79,7 @@ int main(void)
 	group_triangles(cube_vertices, triangles);
 
 	// tests
-	loop(terminal_x, terminal_y, terminal_z, p_cube_vertices, cube_vertices);
+	loop(terminal_x, terminal_y, terminal_z, cube_vertices, cube_vertices);
 	
 	return 0;
 }
