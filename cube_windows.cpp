@@ -103,7 +103,7 @@ void get_screen_size(int* p_screen)
 
 	// get console width and height
 	int columns = 150, rows = 35;
-#ifdef _MSC_VER
+#ifdef _WIN32
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
   
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
@@ -460,7 +460,7 @@ void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertice
     //rotation += rotation_increment; 
     //std::cout << "growing rotation by " << rotation_increment << " to get " << rotation << std::endl;
 
-#ifdef _MSC_VER
+#ifdef _WIN32
     Sleep(1000);
 #else
     sleep(1);
