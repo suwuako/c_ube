@@ -18,12 +18,12 @@ const bool rotate_y = true;
 const bool rotate_z = true;
 
 void get_screen_size(int* p_screen);
-void draw_cube_vertices(double* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z);
+void draw_cube_vertices(double* p_cube_vertices[3], int len_to_vertex, int terminal_x, int terminal_y, int terminal_z);
 void test_vertex_render(int terminal_x, int terminal_y, double cube_vertices[8][3]);
 void rotate_vertices(double angle, double cube_vertices[8][3], double* p_cube_vertices, int terminal_x, int terminal_y, int terminal_z);
 void multiply_rotation_matrices(double* matrix, double* coord);
 void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertices, double cube_vertices[8][3]);
-void group_triangles(double cube_vertices[8][3], double* p_triangles);
+void group_triangles(double *cube_vertices[3], double* p_triangles[3][3]);
 
 int main(void)
 {
@@ -104,7 +104,7 @@ void get_screen_size(int* p_screen)
 }
 
 
-void draw_cube_vertices(double* p_cube_vertices, int len_to_vertex, int terminal_x, int terminal_y, int terminal_z)
+void draw_cube_vertices(double *p_cube_vertices[3], int len_to_vertex, int terminal_x, int terminal_y, int terminal_z)
 {
 	/*
 		I'm using a weird hacky way to draw the vertices - it probably would be better to use some form of matrix multiplication but its done this way:
@@ -443,7 +443,7 @@ void loop(int terminal_x, int terminal_y, int terminal_z, double* p_cube_vertice
   }
 }
 
-void group_triangles(double cube_vertices[8][3], double* p_triangles)
+void group_triangles(double *cube_vertices[3], double *p_triangles[3][3])
 {
 	/*
 		to start grouping triangles, we pick two random vertices. these two vertices cannot exceed the length of pythag_len (shortest length between two vertices)
