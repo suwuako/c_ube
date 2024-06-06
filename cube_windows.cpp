@@ -140,9 +140,9 @@ void draw_cube_vertices(double *p_cube_vertices[3], int len_to_vertex, int termi
 				if (offset_system[2] == 0)
 				{
 					// 3 * vertex iterates over the number of vertexes in the array (i.e. 3 * 1 -> cube_vertices[1][0])
-					*(p_cube_vertices + (3 * vertex) + j) = centre_x - pythag_len;
+					p_cube_vertices[vertex][j] = centre_x - pythag_len;
 				} else {
-					*(p_cube_vertices + (3 * vertex) + j) = centre_x + pythag_len;
+					p_cube_vertices[vertex][j] = centre_x + pythag_len;
 				}
 	
 
@@ -150,18 +150,18 @@ void draw_cube_vertices(double *p_cube_vertices[3], int len_to_vertex, int termi
 				// y coordinate
 				if (offset_system[1] == 0)
 				{
-					*(p_cube_vertices + (3 * vertex) + j) = centre_y - pythag_len;
+					p_cube_vertices[vertex][j] = centre_y - pythag_len;
 				} else {
-					*(p_cube_vertices + (3 * vertex) + j) = centre_y + pythag_len;
+					p_cube_vertices[vertex][j] = centre_y + pythag_len;
 				}
 
 			} else if (j == 2) {
 				// z coordinate
 				if (offset_system[0] == 0)
 				{
-					*(p_cube_vertices + (3 * vertex) + j) = centre_z - pythag_len;
+					p_cube_vertices[vertex][j] = centre_z - pythag_len;
 				} else {
-					*(p_cube_vertices + (3 * vertex) + j) = centre_z + pythag_len;
+					p_cube_vertices[vertex][j] = centre_z + pythag_len;
 				}
 
 			} else {
