@@ -11,13 +11,15 @@
 
 
 const int triangle_offset = 20;
-const char lightmap[] = {'#', '-'};
+const char lightmap[] = {'#', '.'};
 
 bool in_triangle(double* p_vertices, double* A, double* B, double* C, int x, int y);
 double get_depth_buffer(double* A, double* B, double* C, int x, int y);
 void get_screen_size(int* p_screen);
 void render_frame(double* p_triangles, int terminal_x, int terminal_y);
 void assign_coordinates(double* p_triangles, double* A, double* B, double* C, int triangle_iteration);
+void rotate(double* p_triangles, double triangles[2][3][3], double angle, int terminal_x, int terminal_y, int terminal_z);
+void multiply_rotation_matrices(double* matrix, double* coord);
 char get_pixel(double* p_triangles, int x, int y);
 
 struct coordinate {
@@ -33,6 +35,7 @@ int main()
     
     int terminal_x = screen_size[0];
     int terminal_y = screen_size[1];
+    int terminal_z = terminal_x + terminal_y;
 
     double centre_x = terminal_x / 2;
     double centre_y = terminal_y / 2;
@@ -40,9 +43,22 @@ int main()
 
     double triangles[2][3][3] = {
         {
-			{centre_x + triangle_offset, centre_y, centre_z}, 
-			{centre_x, centre_y + triangle_offset, centre_z}, 
-			{centre_x, centre_y, centre_z + triangle_offset}
+			{10, 20, 150}, 
+			{10, 200, 15}, 
+			{60, 10, 10}
+		},
+		{
+            {0, 120, 10},
+            {20, 10, 50},
+            {40, 180, 250}
+		}
+	};
+    /*
+    double triangles[2][3][3] = {
+        {
+			{centre_x - triangle_offset, centre_y, centre_z + triangle_offset}, 
+			{centre_x + triangle_offset, centre_y, centre_z - triangle_offset}, 
+			{centre_x - triangle_offset/2, centre_y + triangle_offset, centre_z + triangle_offset/2}
 		},
 		{
 			{centre_x, centre_y, centre_z}, 
@@ -50,12 +66,21 @@ int main()
 			{centre_x + triangle_offset, centre_y + (triangle_offset / 2), centre_z + triangle_offset}
 		}
 
-	};      
+	};
+    */
     double* p_triangles = &triangles[0][0][0];
+    double angle = 0;
 
     std::cout << "dimensions: " << screen_size[0] << ", " << screen_size[1] << '\n';
+
     render_frame(p_triangles, terminal_x, terminal_y);
-    
+    while(true)
+    {
+        render_frame(p_triangles, terminal_x, terminal_y);
+        rotate(p_triangles, triangles, angle, terminal_x, terminal_y, terminal_z);
+        angle += 0.01;
+    }
+
     return 0;
 }
 
@@ -107,7 +132,7 @@ bool in_triangle(double* p_vertices, double* A, double* B, double* C, int x, int
     double beta = ((C_y - A_y)*(x - C_x) + (A_x - C_x)*(y - C_y)) / ((B_y - C_y)*(A_x - C_x) + (C_x - B_x)*(A_y - C_y));
     double gamma = 1.0f - alpha - beta;
 
-    if (alpha >= 0 && beta >= 0 && gamma >= 0 && (alpha + beta + gamma) <= 1)
+    if (alpha >= 0 && beta >= 0 && gamma >= 0)
     {
         return true;
     }
@@ -181,4 +206,116 @@ double get_depth_buffer(double* A, double* B, double* C, int x, int y)
     beta = (x - A_x - alpha * (B_x - A_x)) / (C_x - A_x);
 
     return A_z + alpha * (B_z - A_z) + beta * (C_z - A_z);
+}
+
+void rotate(double* p_triangles, double triangles[2][3][3], double angle, int terminal_x, int terminal_y, int terminal_z)
+{
+    double centre_x = terminal_x / 2;
+    double centre_y = terminal_y / 2;
+    double centre_z = terminal_z / 2;
+
+    double new_triangles[2][3][3];
+
+    for (int triangle = 0; triangle < 2; triangle++)
+    {
+        for (int vertex = 0; vertex < 3; vertex++)
+        {
+            for (int coord = 0; coord < 3; coord++)
+            {
+                if (coord == 0)
+                {
+                    new_triangles[triangle][vertex][coord] = triangles[triangle][vertex][coord] - centre_x;
+                } else if (coord == 1) {
+                    new_triangles[triangle][vertex][coord] = triangles[triangle][vertex][coord] - centre_y;
+                } else if (coord == 2) {
+                    new_triangles[triangle][vertex][coord] = triangles[triangle][vertex][coord] - centre_z;
+                }    
+            }
+        }
+    }
+
+    double y_array[3][3] = 
+    {
+      {cos(angle),  0,  sin(angle)  },
+      {0,    1,  0  },
+      {-sin(angle),  0,  cos(angle)  }
+    };
+
+    for (int triangle = 0; triangle < 2; triangle++)
+    {
+        for (int vertex = 0; vertex < 3; vertex++)
+        {
+            multiply_rotation_matrices(&y_array[0][0], &new_triangles[triangle][vertex][0]);
+        }
+    }
+
+    for (int triangle = 0; triangle < 2; triangle++)
+    {
+        for (int vertex = 0; vertex < 3; vertex++)
+        {
+            for (int coord = 0; coord < 3; coord++)
+            {
+                if (coord == 0)
+                {
+                    new_triangles[triangle][vertex][coord] = triangles[triangle][vertex][coord] + centre_x;
+                } else if (coord == 1) {
+                    new_triangles[triangle][vertex][coord] = triangles[triangle][vertex][coord] + centre_y;
+                } else if (coord == 2) {
+                    new_triangles[triangle][vertex][coord] = triangles[triangle][vertex][coord] + centre_z;
+                }    
+            }
+        }
+    }
+
+    //write to pointer
+    for (int triangle = 0; triangle < 2; triangle++)
+    {
+        for (int vertex = 0; vertex < 3; vertex++)
+        {
+            for (int coord = 0; coord < 3; coord++)
+            {
+                *(p_triangles + 9 * triangle + 3 * vertex + coord) = new_triangles[triangle][vertex][coord];
+            }
+        }
+    }
+
+}
+
+void multiply_rotation_matrices(double* matrix, double* coord)
+{
+  // apply arrays to local scope
+  double rotation_matrix[3][3];
+  double rotation_coord[3];
+  double new_coord[3];
+
+
+  for (int i = 0; i < 3; i++)
+  {
+    rotation_coord[i] = *(coord + i);
+  }
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {  
+      rotation_matrix[i][j] = *(matrix + 3*i + j);
+    }
+  }
+
+  // rotation matrices work by having the rotation matrix multiply by coordinate 
+  for (int i = 0; i < 3; i++)
+  {
+    double sum{0};
+    for (int j = 0; j < 3; j++)
+    {
+      sum += rotation_matrix[i][j] * rotation_coord[j];
+    }
+    new_coord[i] = sum;
+  }
+  
+  // rewrite coordinate to p_coord
+  for (int i = 0; i < 3; i++)
+  {
+    *(coord + i) = new_coord[i];
+  }
 }
