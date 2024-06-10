@@ -9,35 +9,45 @@
     #include <unistd.h>
 #endif
 
+
 const int triangle_offset = 10;
 
 bool in_triangle(double* p_vertices, int x, int y);
 void get_screen_size(int* p_screen);
 
+struct coordinate {
+    double x;
+    double y;
+    double z;
+};
+
 int main()
 {
     int screen_size[2];
-    get_screen_size(&screen_size);
+    get_screen_size(&screen_size[0]);
 
     double centre_x = screen_size[0] / 2;
     double centre_y = screen_size[1] / 2;
     double centre_z = (screen_size[0] + screen_size[1]) / 2;
 
-    double triangles[2][3][3] = {
-        {
-            {centre_x + triangle_offset, centre_y, centre_z},
-            {centre_x, centre_y + triangle_offset, centre_z},
-            {centre_x, centre_y, centre_z + triangle_offset}
-        },
-        {
-            {centre_x, centre_y, centre_z},
-            {centre_x + triangle_offset, centre_y, centre_z + triangle_offset},
-            {centre_x + triangle_offset, centre_y + (triangle_offset / 2), centre_z + triangle_offset}
-        }
+    double triangles[3][2] = {
+        {35, 70},
+        {20, 40},
+        {50, 20}
     };
+        
+    double* p_triangles = &triangles[0][0];
 
-    double* p_triangles = &triangles[0][0][0];
+    std::cout << "dimensions: " << screen_size[0] << ", " << screen_size[1] << '\n';
 
+    for (int x = 0; x < screen_size[0]; x++)
+    {
+        for (int y = 0; y < screen_size[1]; y++)
+        {
+            std::cout << in_triangle(p_triangles, x, y);
+        }
+        std::cout << '\n';
+    }
     return 0;
 }
 
@@ -78,5 +88,22 @@ void get_screen_size(int* p_screen)
 
 bool in_triangle(double* p_vertices, int x, int y)
 {
+    double A_x = *p_vertices;
+    double A_y = *(p_vertices + 1);
+    double B_x = *(p_vertices + 2);
+    double B_y = *(p_vertices + 3);
+    double C_x = *(p_vertices + 4);
+    double C_y = *(p_vertices + 5);
 
+    double alpha = ((B_y - C_y)*(x - C_x) + (C_x - B_x)*(y - C_y)) / ((B_y - C_y)*(A_x - C_x) + (C_x - B_x)*(A_y - C_y));
+    double beta = ((C_y - A_y)*(x - C_x) + (A_x - C_x)*(y - C_y)) / ((B_y - C_y)*(A_x - C_x) + (C_x - B_x)*(A_y - C_y));
+    double gamma = 1.0f - alpha - beta;
+
+    if (alpha >= 0 && beta >= 0 && gamma >= 0 && (alpha + beta + gamma) <= 1)
+    {
+        return true;
+    }
+    return false;
+
+    return false;
 }
