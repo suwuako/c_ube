@@ -35,6 +35,8 @@ int main()
     double centre_x = terminal_x / 2;
     double centre_y = terminal_y / 2;
     double centre_z = (terminal_x + terminal_y) / 2;
+
+    /*
     double triangles[2][3][3] = {
         {
 			{55, 40, 255}, 
@@ -47,21 +49,20 @@ int main()
             {20, 90, 125}
 		}
 	};
-    /*
+    */
     double triangles[2][3][3] = {
         {
-			{centre_x - triangle_offset, centre_y, centre_z + triangle_offset}, 
-			{centre_x + triangle_offset, centre_y, centre_z - triangle_offset}, 
-			{centre_x - triangle_offset/2, centre_y + triangle_offset, centre_z + triangle_offset/2}
+			{centre_x + triangle_offset*2, centre_y, centre_z}, 
+			{centre_x, centre_y + triangle_offset*4, centre_z}, 
+			{centre_x, centre_y + triangle_offset, centre_z + triangle_offset*5}
 		},
 		{
 			{centre_x, centre_y, centre_z}, 
-			{centre_x + triangle_offset, centre_y, centre_z + triangle_offset},
-			{centre_x + triangle_offset, centre_y + (triangle_offset / 2), centre_z + triangle_offset}
+			{centre_x + triangle_offset*2, centre_y, centre_z - triangle_offset*5},
+			{centre_x + triangle_offset*2, centre_y + triangle_offset*2, centre_z + triangle_offset*6.5}
 		}
 
 	};
-    */
     double* p_triangles = &triangles[0][0][0];
     double angle = M_PI/20;
 
@@ -226,9 +227,9 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
 
     double y_array[3][3] = 
     {
-        {cos(angle),    0,          sin(angle)  },
+        {cos(angle+0.5),    0,          sin(angle+0.5)  },
         {0,             1,          0           },
-        {-sin(angle),   0,          cos(angle)  }
+        {-sin(angle+0.5),   0,          cos(angle+0.5)  }
     };
 
     double x_array[3][3] = 
@@ -247,7 +248,8 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
             {
                 new_triangles[triangle][vertex][axis] = triangles[triangle][vertex][axis] - centre_offsets[axis];
             }
-            multiply_rotation_matrices(&x_array[0][0], &new_triangles[triangle][vertex][0]);
+            multiply_rotation_matrices(&y_array[0][0], &new_triangles[triangle][vertex][0]);
+            multiply_rotation_matrices(&z_array[0][0], &new_triangles[triangle][vertex][0]);
 
             for (int axis = 0; axis < 3; axis ++)
             {
