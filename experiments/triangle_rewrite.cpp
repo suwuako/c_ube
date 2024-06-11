@@ -69,7 +69,7 @@ int main()
 	};
     */
     double* p_triangles = &triangles[0][0][0];
-    double angle = 0;
+    double angle = M_PI/100;
 
     std::cout << "dimensions: " << screen_size[0] << ", " << screen_size[1] << '\n';
 
@@ -78,7 +78,14 @@ int main()
     {
         render_frame(p_triangles, terminal_x, terminal_y);
         rotate(p_triangles, triangles, angle, terminal_x, terminal_y, terminal_z);
-        angle += 0.01;
+        angle += M_PI/1000;
+
+
+#ifdef _WIN32
+        Sleep(1000);
+#else
+        sleep(1);
+#endif
     }
 
     return 0;

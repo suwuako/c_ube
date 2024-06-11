@@ -346,7 +346,7 @@ void rotate_vertices(double angle, double cube_vertices[8][3], double* p_cube_ve
     if (rotate_x)
     {
       multiply_rotation_matrices(&x_array[0][0], &cube_vertices_remap[vertex][0]);
-    }
+            }
     
     if(rotate_y)
     {
