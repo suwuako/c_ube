@@ -252,7 +252,6 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
                 new_triangles[triangle][vertex][axis] = triangles[triangle][vertex][axis] - centre_offsets[axis];
             }
             multiply_rotation_matrices(&x_array[0][0], &new_triangles[triangle][vertex][0]);
-            multiply_rotation_matrices(&z_array[0][0], &new_triangles[triangle][vertex][0]);
 
             for (int axis = 0; axis < 3; axis ++)
             {
