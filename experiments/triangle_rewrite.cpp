@@ -1,5 +1,7 @@
 #include <iostream>
 #include <math.h>
+#include <chrono>
+#include <thread>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -10,7 +12,7 @@
 #endif
 
 
-const int triangle_offset = 20;
+const int triangle_offset = 7;
 const char lightmap[] = {'#', '.'};
 
 bool in_triangle(double* p_vertices, double* A, double* B, double* C, int x, int y);
@@ -52,14 +54,14 @@ int main()
     */
     double triangles[2][3][3] = {
         {
-			{centre_x + triangle_offset*2, centre_y, centre_z}, 
-			{centre_x, centre_y + triangle_offset*4, centre_z}, 
-			{centre_x, centre_y + triangle_offset, centre_z + triangle_offset*5}
+			{centre_x + triangle_offset*3, centre_y, centre_z}, 
+			{centre_x - triangle_offset, centre_y + triangle_offset*3, centre_z}, 
+			{centre_x - triangle_offset, centre_y, centre_z + triangle_offset*3}
 		},
 		{
 			{centre_x, centre_y, centre_z}, 
-			{centre_x + triangle_offset*2, centre_y, centre_z - triangle_offset*5},
-			{centre_x + triangle_offset*2, centre_y + triangle_offset*2, centre_z + triangle_offset*6.5}
+			{centre_x + triangle_offset*3, centre_y, centre_z - triangle_offset*3},
+			{centre_x + triangle_offset*3, centre_y + triangle_offset*3, centre_z + triangle_offset*3}
 		}
 
 	};
@@ -78,7 +80,8 @@ int main()
 #ifdef _WIN32
         Sleep(350);
 #else
-        sleep(1);
+        std::chrono::milliseconds timespan(35);
+        std::this_thread::sleep_for(timespan);
 #endif
     }
 
@@ -227,9 +230,9 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
 
     double y_array[3][3] = 
     {
-        {cos(angle+0.5),    0,          sin(angle+0.5)  },
+        {cos(angle),    0,          sin(angle)  },
         {0,             1,          0           },
-        {-sin(angle+0.5),   0,          cos(angle+0.5)  }
+        {-sin(angle),   0,          cos(angle)  }
     };
 
     double x_array[3][3] = 
@@ -248,7 +251,7 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
             {
                 new_triangles[triangle][vertex][axis] = triangles[triangle][vertex][axis] - centre_offsets[axis];
             }
-            multiply_rotation_matrices(&y_array[0][0], &new_triangles[triangle][vertex][0]);
+            multiply_rotation_matrices(&x_array[0][0], &new_triangles[triangle][vertex][0]);
             multiply_rotation_matrices(&z_array[0][0], &new_triangles[triangle][vertex][0]);
 
             for (int axis = 0; axis < 3; axis ++)
