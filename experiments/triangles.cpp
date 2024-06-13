@@ -11,14 +11,14 @@
     #include <unistd.h>
 #endif
 
-
+const int frame_rate = 20;
 const int triangle_count = 3;
 const int triangle_offset = 7;
-const char lightmap[] = {'@', '.'};
+const char lightmap[] = {'@', '.', '|', 'o'};
 
-const double x_angle_offset = 0.0;
-const double y_angle_offset = 0.15;
-const double z_angle_offset = 0.0;
+const double x_angle_offset = M_PI / 50;
+const double y_angle_offset = M_PI / 40;
+const double z_angle_offset = M_PI / 100;
 
 
 bool in_triangle(double* p_vertices, double* A, double* B, double* C, int x, int y);
@@ -26,7 +26,7 @@ double get_depth_buffer(double* A, double* B, double* C, int x, int y);
 void get_screen_size(int* p_screen);
 void render_frame(double* p_triangles, int terminal_x, int terminal_y);
 void assign_coordinates(double* p_triangles, double* A, double* B, double* C, int triangle_iteration);
-void rotate(double* p_triangles, double triangles[2][3][3], double angle, int terminal_x, int terminal_y, int terminal_z);
+void rotate(double* p_triangles, double triangles[triangle_count][3][3], double angle, int terminal_x, int terminal_y, int terminal_z);
 void multiply_rotation_matrices(double* matrix, double* coord);
 char get_pixel(double* p_triangles, int x, int y);
 
@@ -44,33 +44,25 @@ int main()
     double centre_y = terminal_y / 2;
     double centre_z = (terminal_x + terminal_y) / 2;
 
-    /*
-    double triangles[2][3][3] = {
-        {
-			{55, 40, 255}, 
-			{65, 80, 135}, 
-			{25, 25, 95}
-		},
-		{
-            {40, 60, 245},
-            {60, 35, 85},
-            {20, 90, 125}
-		}
-	};
-    */
-    double triangles[2][3][3] = {
-        {
-			{centre_x + triangle_offset*3, centre_y, centre_z}, 
-			{centre_x - triangle_offset, centre_y + triangle_offset*3, centre_z}, 
+    double triangles[triangle_count][3][3] = 
+    	{
+        	{
+			{centre_x + triangle_offset*5, centre_y, centre_z}, 
+			{centre_x - triangle_offset, centre_y + triangle_offset*5, centre_z}, 
 			{centre_x - triangle_offset, centre_y, centre_z + triangle_offset*3}
 		},
 		{
 			{centre_x, centre_y, centre_z}, 
 			{centre_x + triangle_offset*3, centre_y, centre_z - triangle_offset*3},
 			{centre_x + triangle_offset*3, centre_y + triangle_offset*3, centre_z + triangle_offset*3}
+		},
+		{
+			{centre_x + triangle_offset*3, centre_y, centre_z}, 
+			{centre_x, centre_y + triangle_offset*3, centre_z + triangle_offset*3},
+			{centre_x, centre_y + triangle_offset*3, centre_z - triangle_offset*3}
 		}
-
 	};
+
     double* p_triangles = &triangles[0][0][0];
     double angle = M_PI/20;
 
@@ -82,11 +74,10 @@ int main()
         render_frame(p_triangles, terminal_x, terminal_y);
         rotate(p_triangles, triangles, angle, terminal_x, terminal_y, terminal_z);
 
-
 #ifdef _WIN32
-        Sleep(350);
+        Sleep(frame_rate);
 #else
-        std::chrono::milliseconds timespan(45);
+        std::chrono::milliseconds timespan(frame_rate);
         std::this_thread::sleep_for(timespan);
 #endif
     }
@@ -169,7 +160,7 @@ char get_pixel(double* p_triangles, int x, int y)
     double depth_buffer = 0;
     char output_char = ' ';
         
-    for (int triangle = 0; triangle < 2; triangle++)
+    for (int triangle = 0; triangle < triangle_count; triangle++)
     {
         assign_coordinates(p_triangles, A, B, C, triangle);
         point_depth = get_depth_buffer(A, B, C, x, y);
@@ -218,13 +209,13 @@ double get_depth_buffer(double* A, double* B, double* C, int x, int y)
     return A_z + alpha * (B_z - A_z) + beta * (C_z - A_z);
 }
 
-void rotate(double* p_triangles, double triangles[2][3][3], double angle, int terminal_x, int terminal_y, int terminal_z)
+void rotate(double* p_triangles, double triangles[triangle_count][3][3], double angle, int terminal_x, int terminal_y, int terminal_z)
 {
     double centre_x = terminal_x / 2;
     double centre_y = terminal_y / 2;
     double centre_z = terminal_z / 2;
 
-    double new_triangles[2][3][3];
+    double new_triangles[triangle_count][3][3];
     double centre_offsets[3] = {centre_x, centre_y, centre_z};
 
     double z_array[3][3] = 
@@ -249,7 +240,7 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
     };
     
 
-    for (int triangle = 0; triangle < 2; triangle++)
+    for (int triangle = 0; triangle < triangle_count; triangle++)
     {
         for (int vertex = 0; vertex < 3; vertex++)
         {
@@ -257,10 +248,12 @@ void rotate(double* p_triangles, double triangles[2][3][3], double angle, int te
             {
                 new_triangles[triangle][vertex][axis] = triangles[triangle][vertex][axis] - centre_offsets[axis];
             }
-            multiply_rotation_matrices(&x_array[0][0], &new_triangles[triangle][vertex][0]);
-            multiply_rotation_matrices(&z_array[0][0], &new_triangles[triangle][vertex][0]);
 
-            for (int axis = 0; axis < 3; axis ++)
+	    multiply_rotation_matrices(&x_array[0][0], &new_triangles[triangle][vertex][0]);
+	    //multiply_rotation_matrices(&y_array[0][0], &new_triangles[triangle][vertex][0]);
+	    //multiply_rotation_matrices(&z_array[0][0], &new_triangles[triangle][vertex][0]);
+        
+	    for (int axis = 0; axis < 3; axis ++)
             {
                 new_triangles[triangle][vertex][axis] += centre_offsets[axis];
                 *(p_triangles + 9 * triangle + 3 * vertex + axis) = new_triangles[triangle][vertex][axis];
