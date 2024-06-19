@@ -11,7 +11,7 @@
     #include <unistd.h>
 #endif
 
-const int frame_rate = 20;
+const int frame_rate = 10;
 const int triangle_count = 3;
 const int triangle_offset = 7;
 const char lightmap[] = {'@', '.', '|', 'o'};
@@ -64,7 +64,7 @@ int main()
 	};
 
     double* p_triangles = &triangles[0][0][0];
-    double angle = M_PI/20;
+    double angle = M_PI/100000;
 
     std::cout << "dimensions: " << screen_size[0] << ", " << screen_size[1] << '\n';
 
