@@ -1,3 +1,3 @@
 #pragma once
 
-struct coordinate_2d get_screen_size();
+struct coordinate_3d get_screen_size();

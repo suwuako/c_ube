@@ -2,6 +2,9 @@
 #ifndef _DATATYPES_H
 #define _DATATYPES_H
 
+#define VERTEX_COUNT 8
+#define ORIGIN_VERTEX_COUNT 4
+
 struct coordinate_3d
 {
     double x;
