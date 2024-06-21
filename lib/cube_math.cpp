@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 
+#include "cube_math.hpp"
 #include "datatypes.hpp"
 
 void create_cube_vertices(
@@ -30,9 +31,9 @@ void create_cube_vertices(
 
     for (int vertex = 0; vertex < VERTEX_COUNT; vertex++)
     {
-        cube_vertices[vertex].x = vertex_combination_tracker[0] * adjusted_distance; 
-        cube_vertices[vertex].y = vertex_combination_tracker[1] * adjusted_distance; 
-        cube_vertices[vertex].z = vertex_combination_tracker[2] * adjusted_distance; 
+        cube_vertices[vertex].x = vertex_combination_tracker[0] * adjusted_distance + terminal_centre.x; 
+        cube_vertices[vertex].y = vertex_combination_tracker[1] * adjusted_distance + terminal_centre.y; 
+        cube_vertices[vertex].z = vertex_combination_tracker[2] * adjusted_distance + terminal_centre.z; 
 
         int increment = 1;
 
@@ -118,6 +119,7 @@ void group_ajacent_points(
     }
 }
 
+
 void group_vertices_to_triangles(
         struct coordinate_3d triangle_vertices[12][3],
         struct coordinate_3d cube_vertices[8],
@@ -147,6 +149,103 @@ void group_vertices_to_triangles(
     {
         struct coordinate_3d ajacent_points[3] = {};
         group_ajacent_points(origin_vertices[origin_vertex], cube_vertices, ajacent_points, DISTANCE_BETWEEN_CLOSEST_VERTICES);
-   
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (i == 0)
+            {
+                triangle_vertices[triangle_vertex_count][0] = origin_vertices[origin_vertex];
+                triangle_vertices[triangle_vertex_count][1] = ajacent_points[0];
+                triangle_vertices[triangle_vertex_count][2] = ajacent_points[1];
+            } else if (i == 1) {
+                triangle_vertices[triangle_vertex_count][0] = origin_vertices[origin_vertex];
+                triangle_vertices[triangle_vertex_count][1] = ajacent_points[1];
+                triangle_vertices[triangle_vertex_count][2] = ajacent_points[2];
+            } else if (i == 2) {
+                triangle_vertices[triangle_vertex_count][0] = origin_vertices[origin_vertex];
+                triangle_vertices[triangle_vertex_count][1] = ajacent_points[0];
+                triangle_vertices[triangle_vertex_count][2] = ajacent_points[2];
+            }
+            triangle_vertex_count++;
+        }
     }
+}
+
+void rotate(
+        struct coordinate_3d cube_vertices[8],
+        struct coordinate_3d terminal_dimensions,
+        double angle
+        )
+{
+    struct coordinate_3d terminal_centre;
+
+    terminal_centre.x = terminal_dimensions.x / 2;
+    terminal_centre.y = terminal_dimensions.y / 2;
+    terminal_centre.z = terminal_dimensions.z / 2;
+
+    struct coordinate_3d new_cube_vertices[8];
+    
+    double z_rotation[3][3] = 
+    {
+        {cos(angle),  -sin(angle),    0},
+        {sin(angle),  cos(angle),     0},
+        {0,           0,              1}
+    };
+
+    double y_rotation[3][3] = 
+    {
+        {cos(angle),    0,          sin(angle)  },
+        {0,             1,          0           },
+        {-sin(angle),   0,          cos(angle)  }
+    };
+
+    double x_rotation[3][3] = 
+    {
+        {1,             0,          0},
+        {0,             cos(angle), -sin(angle)},
+        {0,             sin(angle), cos(angle)}
+    };
+    
+    for (int vertex = 0; vertex < 8; vertex++)
+    {
+        cube_vertices[vertex].x -= terminal_centre.x;
+        cube_vertices[vertex].y -= terminal_centre.z;
+        cube_vertices[vertex].z -= terminal_centre.y;
+
+        multiply_matrices(cube_vertices[vertex], x_rotation);
+
+        cube_vertices[vertex].x += terminal_centre.x;
+        cube_vertices[vertex].y += terminal_centre.z;
+        cube_vertices[vertex].z += terminal_centre.y;
+    }
+}
+
+void multiply_matrices(
+        struct coordinate_3d point,
+        double rotation_matrix[3][3]
+        )
+{
+    struct coordinate_3d new_point;
+    double sum = 0;
+
+    for (int i = 0; i < 3; i++)
+    {
+        sum += rotation_matrix[i][0] * point.x;
+        sum += rotation_matrix[i][1] * point.y;
+        sum += rotation_matrix[i][2] * point.z;
+
+        if (i == 0)
+        {
+            new_point.x = sum;
+        } else if (i == 1) {
+            new_point.y = sum;
+        } else {
+            new_point.z = sum;
+        }
+        sum = 0;
+    }
+
+    point.x = new_point.x;
+    point.y = new_point.y;
+    point.z = new_point.z;
 }

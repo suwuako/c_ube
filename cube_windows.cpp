@@ -4,7 +4,7 @@
 #include <thread>
 
 #ifdef _WIN32 
-  #include <windows.h>
+    #include <windows.h>
 #else
   #include <sys/ioctl.h>
   #include <termios.h> // maybe don't use this one after all -V

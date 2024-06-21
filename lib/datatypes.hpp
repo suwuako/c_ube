@@ -4,6 +4,7 @@
 
 #define VERTEX_COUNT 8
 #define ORIGIN_VERTEX_COUNT 4
+#define TRIANGLE_COUNT 12
 
 struct coordinate_3d
 {
