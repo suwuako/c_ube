@@ -32,11 +32,6 @@ void rotate(
         double angle
         );
 
-void multiply_matrices(
-        struct coordinate_3d point,
-        double rotation_matrix[3][3]
-        );
-
 struct coordinate_3d vectorise(struct coordinate_3d A, struct coordinate_3d B);
 
 double get_vector_length(struct coordinate_3d AB);

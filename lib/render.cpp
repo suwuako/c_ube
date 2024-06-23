@@ -31,14 +31,23 @@ char get_pixel(
 
     for (int triangle = 0; triangle < TRIANGLE_COUNT; triangle++)
     {
+        std::cout << triangle << '\n';
 
-        point_depth = get_depth_buffer(triangle_vertices[triangle], x, y);
-        
         if (in_triangle(triangle_vertices[triangle], x, y) && point_depth > depth_buffer)
         {
-            output_char = '1';
+            output_char = '.';
+            depth_buffer = point_depth;
+        }
+        
+        for (int i = 0; i < 3; i++)
+        {
+            if (x == (int)triangle_vertices[triangle][i].x && y == (int) triangle_vertices[triangle][i].y)
+            {
+                output_char = '#';
+            }
         }
     }
+
     return output_char;
 }
 

@@ -31,7 +31,7 @@ void create_cube_vertices(
 
     for (int vertex = 0; vertex < VERTEX_COUNT; vertex++)
     {
-        cube_vertices[vertex].x = vertex_combination_tracker[0] * adjusted_distance + terminal_centre.x; 
+        cube_vertices[vertex].x = vertex_combination_tracker[0] * adjusted_distance + terminal_centre.x;
         cube_vertices[vertex].y = vertex_combination_tracker[1] * adjusted_distance + terminal_centre.y; 
         cube_vertices[vertex].z = vertex_combination_tracker[2] * adjusted_distance + terminal_centre.z; 
 
@@ -182,8 +182,6 @@ void rotate(
     terminal_centre.x = terminal_dimensions.x / 2;
     terminal_centre.y = terminal_dimensions.y / 2;
     terminal_centre.z = terminal_dimensions.z / 2;
-
-    struct coordinate_3d new_cube_vertices[8];
     
     double z_rotation[3][3] = 
     {
@@ -206,46 +204,13 @@ void rotate(
         {0,             sin(angle), cos(angle)}
     };
     
+    
     for (int vertex = 0; vertex < 8; vertex++)
     {
         cube_vertices[vertex].x -= terminal_centre.x;
         cube_vertices[vertex].y -= terminal_centre.z;
         cube_vertices[vertex].z -= terminal_centre.y;
 
-        multiply_matrices(cube_vertices[vertex], x_rotation);
-
-        cube_vertices[vertex].x += terminal_centre.x;
-        cube_vertices[vertex].y += terminal_centre.z;
-        cube_vertices[vertex].z += terminal_centre.y;
+        
     }
-}
-
-void multiply_matrices(
-        struct coordinate_3d point,
-        double rotation_matrix[3][3]
-        )
-{
-    struct coordinate_3d new_point;
-    double sum = 0;
-
-    for (int i = 0; i < 3; i++)
-    {
-        sum += rotation_matrix[i][0] * point.x;
-        sum += rotation_matrix[i][1] * point.y;
-        sum += rotation_matrix[i][2] * point.z;
-
-        if (i == 0)
-        {
-            new_point.x = sum;
-        } else if (i == 1) {
-            new_point.y = sum;
-        } else {
-            new_point.z = sum;
-        }
-        sum = 0;
-    }
-
-    point.x = new_point.x;
-    point.y = new_point.y;
-    point.z = new_point.z;
 }

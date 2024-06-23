@@ -17,7 +17,7 @@
     #include <unistd.h>
 #endif
 
-const int frame_rate = 20;
+const int frame_rate = 2000;
 const int DISTANCE_BETWEEN_CLOSEST_VERTICES = 30;
 const double ROTATION_ANGLE = M_PI/100;
 
@@ -32,6 +32,7 @@ int main(void)
     std::cout << '\n';
 
     struct coordinate_3d cube_vertices[8] = {};
+    struct coordinate_3d *p_cube_vertices = &cube_vertices[0];
     create_cube_vertices(cube_vertices, terminal_dimensions, DISTANCE_BETWEEN_CLOSEST_VERTICES);
 
     // print vertices
@@ -44,7 +45,6 @@ int main(void)
     // a triangle is composed of three vertices that we store
     // each vertex is a 3d coordinate
     struct coordinate_3d triangle_vertices[12][3] = {};
-    group_vertices_to_triangles(triangle_vertices, cube_vertices, DISTANCE_BETWEEN_CLOSEST_VERTICES);
 
     // print triangles
     for (int triangle = 0; triangle < TRIANGLE_COUNT; triangle++)
@@ -59,8 +59,12 @@ int main(void)
 
     while (1)
     {
+        group_vertices_to_triangles(triangle_vertices, cube_vertices, DISTANCE_BETWEEN_CLOSEST_VERTICES);
+
         render_frame(terminal_dimensions, triangle_vertices);
-        rotate(cube_vertices, terminal_dimensions, ROTATION_ANGLE);
+        //rotate(p_cube_vertices, cube_vertices, terminal_dimensions, ROTATION_ANGLE);
+
+
 #ifdef _WIN32
         Sleep(frame_rate);
 
