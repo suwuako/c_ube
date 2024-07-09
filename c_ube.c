@@ -46,6 +46,8 @@ int main(int argc, char *argv[])
     // are defined in lib/cli_args.c
     struct cube_arguments cube_parameters = {};
     cube_parameters = parse_cli_args(argc, argv);
-
     print_cube_params(cube_parameters);
+
+    create_cube_vertices(cube_vertices, cube_parameters);
+    print_cube_vertices(cube_vertices);
 }

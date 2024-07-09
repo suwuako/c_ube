@@ -1,7 +1,7 @@
 #pragma once
 
 #define VERTEX_COUNT 8
-
+#define AXIS_COUNT 3
 
 
 struct coord_3d
