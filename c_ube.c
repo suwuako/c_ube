@@ -7,19 +7,20 @@
 
 /*
     * CLI ARGUMENTS
-    *   --size          / -s dictates the size (vertex to vertex) of the cube 
+    *   --size          / -s dictates the size (length side) of the cube 
     *   --terminal      / -t dictates the size of the terminal
-    *   --speed         / -S terminal refresh rate (in ms)
-    *   -x              / -x x rotation angle
-    *   -y              / -y y rotation angle
-    *   -z              / -z z rotation angle
+    *   --speed         / -S terminal refresh rate (frames/sec)
+    *   -x              / -x x rotation angle amount
+    *   -y              / -y y rotation angle amount
+    *   -z              / -z z rotation angle amount
  */
 
 /*
     * Currently working on:
     * - [x] create file structure
     * - [x] readin user input and put into function
-    * - [ ] start parsing and assigning arguments
+    * - [x] start parsing and assigning arguments
+    * - [ ] create auto assignment for uninputted args
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 

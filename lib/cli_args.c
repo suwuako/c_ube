@@ -5,6 +5,7 @@
 #include "datatypes.h"
 #include "cli_args.h"
 
+
 /*
     * temp comment to display structure of cube_arguments
 
@@ -36,10 +37,45 @@ struct cube_arguments parse_cli_args(int argc, char *argv[])
     return cli_args;
 }
 
+// auto supplies values if they haven't been passed in cli
 void auto_assign_args(struct cube_arguments inputted_args,
                       struct cube_arguments *p_cli_args)
 {
+    const int CUBE_SIZE = 20;
+    const int REFRESH_RATE = 60;
+    const double X = 1.0;
+    const double Y = 1.0;
+    const double Z = 1.0;
 
+    if (inputted_args.size == 0) 
+    {
+        p_cli_args->size = CUBE_SIZE;
+    }
+
+    if (inputted_args.terminal_size == 0)
+    {
+        // TODO: GET TERMINAL SIZE
+    }
+
+    if (inputted_args.refresh_rate == 0)
+    {
+        p_cli_args->refresh_rate = REFRESH_RATE;
+    }
+
+    if (inputted_args.x_angle == 0)
+    {
+        p_cli_args->x_angle = X;
+    }
+
+    if (inputted_args.y_angle == 0)
+    {
+        p_cli_args->y_angle = Y;
+    }
+
+    if (inputted_args.z_angle == 0)
+    {
+        p_cli_args->z_angle = Z;
+    }
 }
 
 void assign_cli_args(int argc, char *argv[],
