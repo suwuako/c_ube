@@ -4,11 +4,13 @@
 #include "lib/cli_args.h"
 #include "lib/datatypes.h"
 #include "lib/misc.h"
+#include "lib/cube_math.h"
 
 /*
     * CLI ARGUMENTS
     *   --size          / -s dictates the size (length side) of the cube 
-    *   --terminal      / -t dictates the size of the terminal
+    *   --terminal_x      / -X dictates the size of the terminal (x)
+    *   --terminal_y      / -Y dictates the size of the terminal (x)
     *   --speed         / -S terminal refresh rate (frames/sec)
     *   -x              / -x x rotation angle amount
     *   -y              / -y y rotation angle amount
@@ -20,14 +22,16 @@
     * - [x] create file structure
     * - [x] readin user input and put into function
     * - [x] start parsing and assigning arguments
-    * - [ ] create auto assignment for uninputted args
+    * - [x] create auto assignment for uninputted args
+    * - [x] update auto assignment to include terminal sizes for both win/linux
+    * - [ ] create cube vertices
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
     * (i.e. --size rahhh) then we default to normal size
     *
     * General TODOS:
-    * - [ ] Complete cli parsing
+    * - [x] Complete cli parsing
     * - [ ] Create cube vertices
     * - [ ] Link cube vertices into triangles
     * - [ ] Render triangles
@@ -37,6 +41,7 @@
 
 int main(int argc, char *argv[])
 {
+    struct coord_3d cube_vertices[VERTEX_COUNT] = {};
     // all arguments (explicitly defined in terminal or not)
     // are defined in lib/cli_args.c
     struct cube_arguments cube_parameters = {};

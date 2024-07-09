@@ -5,7 +5,9 @@
 void print_cube_params(struct cube_arguments params)
 {
     printf("size: %d\n", params.size);
-    printf("terminal: %d\n", params.terminal_size);
+    printf("terminal x: %lf\n", params.terminal_size.x);
+    printf("terminal y: %lf\n", params.terminal_size.y);
+    printf("terminal z: %lf\n", params.terminal_size.z);
     printf("speed: %d\n", params.refresh_rate);
     printf("x angle: %lf\n", params.x_angle);
     printf("y angle: %lf\n", params.y_angle);
