@@ -24,7 +24,8 @@
     * - [x] start parsing and assigning arguments
     * - [x] create auto assignment for uninputted args
     * - [x] update auto assignment to include terminal sizes for both win/linux
-    * - [ ] create cube vertices
+    * - [x] create cube vertices
+    * - [ ] convert cube_vertices to triangles
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
@@ -32,7 +33,7 @@
     *
     * General TODOS:
     * - [x] Complete cli parsing
-    * - [ ] Create cube vertices
+    * - [x] Create cube vertices
     * - [ ] Link cube vertices into triangles
     * - [ ] Render triangles
     * - [ ] Rotate triangles
