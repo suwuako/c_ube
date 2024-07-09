@@ -37,6 +37,8 @@
     * - [ ] Link cube vertices into triangles
     * - [ ] Render triangles
     * - [ ] Rotate triangles
+    * - [ ] have triangles display different characters based off cube face
+    * - [ ] support depth shading
 */
 
 
