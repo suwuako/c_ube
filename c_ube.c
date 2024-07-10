@@ -6,6 +6,7 @@
 #include "lib/datatypes.h"
 #include "lib/misc.h"
 #include "lib/cube_math.h"
+#include "lib/render.h"
 
 /*
     * CLI ARGUMENTS
@@ -48,17 +49,18 @@ int main(int argc, char *argv[])
 {
     // all arguments (explicitly defined in terminal or not)
     // are defined in lib/cli_args.c
-    struct cube_arguments cube_parameters = {};
+    struct cube_arguments cube_parameters;
     cube_parameters = parse_cli_args(argc, argv);
     print_cube_params(cube_parameters);
 
-    struct coord_3d cube_vertices[VERTEX_COUNT] = {};
+    struct coord_3d cube_vertices[VERTEX_COUNT];
     create_cube_vertices(cube_vertices, cube_parameters);
     print_cube_vertices(cube_vertices);
 
-    struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES] = {};
+    struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES];
     group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
     print_triangles(triangles);
 
+    render_frame(cube_parameters, triangles);    
     return 0;
 }

@@ -39,4 +39,6 @@ void print_triangles(struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES
             }
         }
     }
+
+    printf("\n \n");
 }

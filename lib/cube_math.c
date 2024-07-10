@@ -98,6 +98,7 @@ void get_triangles_from_main_vertices(struct coord_3d main_vertices[MAIN_VERTEX_
                 next_index = 0;
             }
 
+
             triangles[triangle_index][1] = ajacent_vertices[ajacent_vertex];
             triangles[triangle_index][2] = ajacent_vertices[next_index];
 
@@ -192,6 +193,7 @@ void set_singular_vertex(struct coord_3d cube_vertices[VERTEX_COUNT],
 
     switch (axis)
     {
+        /*
         // debug version without terminal_centers
         case 0:
             cube_vertices[vertex].x = offset;
@@ -202,9 +204,9 @@ void set_singular_vertex(struct coord_3d cube_vertices[VERTEX_COUNT],
         case 2:
             cube_vertices[vertex].z = offset;
             break;
+        */
 
         // working copy
-        /*
         case 0:
             cube_vertices[vertex].x = offset + terminal_center.x;
             break;
@@ -213,6 +215,6 @@ void set_singular_vertex(struct coord_3d cube_vertices[VERTEX_COUNT],
             break;
         case 2:
             cube_vertices[vertex].z = offset + terminal_center.z;
-            break;*/
+            break;
     }
 }
