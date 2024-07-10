@@ -13,6 +13,13 @@ struct coord_3d
     double z;
 };
 
+struct rotation_matrix
+{
+    double x_rotate[AXIS_COUNT][AXIS_COUNT];
+    double y_rotate[AXIS_COUNT][AXIS_COUNT];
+    double z_rotate[AXIS_COUNT][AXIS_COUNT];
+};
+
 struct cube_arguments
 {
     int size;

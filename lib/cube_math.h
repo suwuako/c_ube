@@ -1,6 +1,24 @@
 #pragma once
 
+
+#include <stdbool.h>
+
 #include "datatypes.h"
+
+
+// rotation functions
+void rotate_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                     struct cube_arguments cube_parameters);
+
+
+struct rotation_matrix init_rotation_matrices(double x, double y, double z);
+
+void multiply_rotation_matrices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                                struct rotation_matrix matrix);
+
+void transform_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                        struct coord_3d terminal, bool towards_origin);
+
 
 // general vector math functions
 struct coord_3d points_to_vector(struct coord_3d a, struct coord_3d b);

@@ -1,10 +1,104 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include "cube_math.h"
 #include "datatypes.h"
 
+
+/*
+    * ROTATION MATRIES
+*/
+// rotates the 8 points of the cube
+void rotate_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                     struct cube_arguments cube_parameters)
+{
+    double x_angle = cube_parameters.x_angle;
+    double y_angle = cube_parameters.y_angle;
+    double z_angle = cube_parameters.z_angle;
+    struct coord_3d terminal = cube_parameters.terminal_size;
+    struct rotation_matrix rotate = init_rotation_matrices(x_angle, y_angle, z_angle);
+
+    // transform each point based back to its origin
+    transform_vertices(cube_vertices, terminal, true);
+    transform_vertices(cube_vertices, terminal, false);
+}
+
+// multiplies rotation matrices
+// helper function for rotation_vertices
+void multiply_rotation_matrices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                                struct rotation_matrix matrix)
+{
+    for (int vertex = 0; vertex < VERTEX_COUNT; vertex++)
+    {
+        cube_vertices[vertex].x;
+
+    }
+}
+
+// transforms vertices to the origin (0,0,0) or away (centre_x, centre_y, centre_z)
+// towards_origin = true -> 0, 0, 0; towards_origin = false -> centres
+void transform_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                        struct coord_3d terminal, bool towards_origin)
+{
+    struct coord_3d center;
+    center.x = terminal.x / 2;
+    center.y = terminal.y / 2;
+    center.z = terminal.z / 2;
+
+    for (int i = 0; i < VERTEX_COUNT; i++)
+    {
+        if (towards_origin)
+        {
+            cube_vertices[i].x -= center.x;
+            cube_vertices[i].y -= center.y;
+            cube_vertices[i].z -= center.z;
+        } else {
+            cube_vertices[i].x += center.x;
+            cube_vertices[i].y += center.y;
+            cube_vertices[i].z += center.z;
+        }
+    }
+}
+
+struct rotation_matrix init_rotation_matrices(double x, double y, double z)
+{
+    struct rotation_matrix matrix;
+    double x_rotate[3][3] = {
+        {1,             0,          0},
+        {0,             cos(x), -sin(x)},
+        {0,             sin(x), cos(x)}
+    };
+
+    double y_rotate[3][3] = {
+        {cos(y),    0,          sin(y)  },
+        {0,             1,          0           },
+        {-sin(y),   0,          cos(y)  }
+    };
+
+    double z_rotate[3][3] = {
+        {cos(z),  -sin(z),    0},
+        {sin(z),  cos(z),     0},
+        {0,           0,              1}
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            matrix.x_rotate[i][j] = x_rotate[i][j];
+            matrix.y_rotate[i][j] = y_rotate[i][j];
+            matrix.z_rotate[i][j] = z_rotate[i][j];
+        }
+    }
+    
+    return matrix;
+}
+
+/*
+    * VECTOR MATH STUFF
+*/
 // converts two points into a vector in the form AB
 struct coord_3d points_to_vector(struct coord_3d a, struct coord_3d b)
 {
@@ -26,6 +120,10 @@ double get_vector_length(struct coord_3d vec)
     return length;
 }
 
+
+/*
+    * TRIANGLE SECTION
+*/
 // groups the 8 vertices of the cube into
 // the 12 triangles that make up our cube
 void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
@@ -130,6 +228,9 @@ void get_main_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
     }
 }
 
+/*
+    * CUBE VERTEX
+*/
 // creates the 8 coordinates of the cube
 void create_cube_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
                           struct cube_arguments cube_parameters)

@@ -28,7 +28,8 @@
     * - [x] update auto assignment to include terminal sizes for both win/linux
     * - [x] create cube vertices
     * - [x] convert cube_vertices to triangles
-    * - [ ] Render triangles
+    * - [x] Render triangles
+    * - [ ] Rotate triangles
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
@@ -38,7 +39,7 @@
     * - [x] Complete cli parsing
     * - [x] Create cube vertices
     * - [x] Link cube vertices into triangles
-    * - [ ] Render triangles
+    * - [x] Render triangles
     * - [ ] Rotate triangles
     * - [ ] have triangles display different characters based off cube face
     * - [ ] support depth shading
@@ -61,6 +62,13 @@ int main(int argc, char *argv[])
     group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
     print_triangles(triangles);
 
-    render_frame(cube_parameters, triangles);    
+    printf("Press enter to continue;\n");
+    scanf("%c");
+    while (true)
+    {
+        render_frame(cube_parameters, triangles);
+        rotate_vertices(cube_vertices, cube_parameters);
+        group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
+    }
     return 0;
 }
