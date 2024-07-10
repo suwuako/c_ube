@@ -10,6 +10,7 @@
     - consts:
         - VERTEX_COUNT - verticies of a cube
         - AXIS_COUNT - axes of a 3d space (x, y, z)
+        - TRIANGLE_COUNT - number of trianlges that make up the faces of a cube
 
 - cube_math.c
     - handles general cube math

@@ -2,7 +2,9 @@
 
 #define VERTEX_COUNT 8
 #define AXIS_COUNT 3
-
+#define TRIANGLE_COUNT 12
+#define TRIANGLE_VERTICES 3
+#define MAIN_VERTEX_COUNT 4
 
 struct coord_3d
 {

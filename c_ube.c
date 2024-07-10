@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "lib/cli_args.h"
 #include "lib/datatypes.h"
@@ -25,7 +26,8 @@
     * - [x] create auto assignment for uninputted args
     * - [x] update auto assignment to include terminal sizes for both win/linux
     * - [x] create cube vertices
-    * - [ ] convert cube_vertices to triangles
+    * - [x] convert cube_vertices to triangles
+    * - [ ] Render triangles
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
@@ -34,7 +36,7 @@
     * General TODOS:
     * - [x] Complete cli parsing
     * - [x] Create cube vertices
-    * - [ ] Link cube vertices into triangles
+    * - [x] Link cube vertices into triangles
     * - [ ] Render triangles
     * - [ ] Rotate triangles
     * - [ ] have triangles display different characters based off cube face
@@ -44,13 +46,19 @@
 
 int main(int argc, char *argv[])
 {
-    struct coord_3d cube_vertices[VERTEX_COUNT] = {};
     // all arguments (explicitly defined in terminal or not)
     // are defined in lib/cli_args.c
     struct cube_arguments cube_parameters = {};
     cube_parameters = parse_cli_args(argc, argv);
     print_cube_params(cube_parameters);
 
+    struct coord_3d cube_vertices[VERTEX_COUNT] = {};
     create_cube_vertices(cube_vertices, cube_parameters);
     print_cube_vertices(cube_vertices);
+
+    struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES] = {};
+    group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
+    print_triangles(triangles);
+
+    return 0;
 }

@@ -12,6 +12,6 @@ a spinning cube implementation written in C
     *   -y              / -y y rotation angle amount
     *   -z              / -z z rotation angle amount
 
-## installation
+## installation / compilation
 
 run `make` and you can run, rename or move `bin-c_ube.out` into `/usr/bin/`
