@@ -141,7 +141,7 @@ void assign_cli_args(int argc, char *argv[],
     for (int i = 1; i < argc; i++)
     {
         if (strcmp(argv[i], "--size") == 0) {
-            p_cli_args->size = atoi(argv[i + 1]);
+            p_cli_args->size = atof(argv[i + 1]);
             p_inputted_args->size = 1;
 
         } else if (strcmp(argv[i], "--terminal_x") == 0) {

@@ -5,7 +5,7 @@
 void print_cube_params(struct cube_arguments params)
 {
     printf("\n=== c_ube arguments ===\n \n");
-    printf("size: %d\n", params.size);
+    printf("size: %lf\n", params.size);
     printf("terminal x: %lf\n", params.terminal_size.x);
     printf("terminal y: %lf\n", params.terminal_size.y);
     printf("terminal z: %lf\n", params.terminal_size.z);

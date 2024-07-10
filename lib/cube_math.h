@@ -19,6 +19,8 @@ void multiply_rotation_matrices(struct coord_3d cube_vertices[VERTEX_COUNT],
 void transform_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
                         struct coord_3d terminal, bool towards_origin);
 
+struct coord_3d multiply_matrix(double matrix[3][3],
+                                struct coord_3d point);
 
 // general vector math functions
 struct coord_3d points_to_vector(struct coord_3d a, struct coord_3d b);

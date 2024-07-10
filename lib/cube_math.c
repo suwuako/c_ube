@@ -22,6 +22,7 @@ void rotate_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
 
     // transform each point based back to its origin
     transform_vertices(cube_vertices, terminal, true);
+    multiply_rotation_matrices(cube_vertices, rotate);
     transform_vertices(cube_vertices, terminal, false);
 }
 
@@ -32,9 +33,51 @@ void multiply_rotation_matrices(struct coord_3d cube_vertices[VERTEX_COUNT],
 {
     for (int vertex = 0; vertex < VERTEX_COUNT; vertex++)
     {
-        cube_vertices[vertex].x;
+        struct coord_3d rotated_point;
+
+        rotated_point = multiply_matrix(matrix.x_rotate, cube_vertices[vertex]);
+        rotated_point = multiply_matrix(matrix.y_rotate, rotated_point);
+        rotated_point = multiply_matrix(matrix.z_rotate, rotated_point);
+
+        cube_vertices[vertex].x = rotated_point.x;
+        cube_vertices[vertex].y = rotated_point.y;
+        cube_vertices[vertex].z = rotated_point.z;
 
     }
+}
+
+struct coord_3d multiply_matrix(double matrix[3][3],
+                                struct coord_3d point)
+{
+    /*
+     * | a b c |     | x |   | ax + by + cz |
+     * | d e f |  x  | y | = | dx + ey + fz |
+     * | g h i |     | z |   | gx + hy + iz |
+     */
+
+    struct coord_3d return_point;
+    double point_arr[3];
+    double new_point[3];
+
+    point_arr[0] = point.x;
+    point_arr[1] = point.y;
+    point_arr[2] = point.z;
+
+    for (int row = 0; row < 3; row++)
+    {
+        double sum = 0;
+        for (int col = 0; col < 3; col++)
+        {
+            sum += matrix[row][col] * point_arr[col];
+        }
+        new_point[row] = sum;
+    }
+
+    return_point.x = new_point[0];
+    return_point.y = new_point[1];
+    return_point.z = new_point[2];
+
+    return return_point;
 }
 
 // transforms vertices to the origin (0,0,0) or away (centre_x, centre_y, centre_z)
@@ -116,7 +159,7 @@ double get_vector_length(struct coord_3d vec)
 {
     double length;
 
-    length = sqrt(abs(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2)));
+    length = sqrt(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2));
     return length;
 }
 
@@ -142,8 +185,8 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
         * that the triangles created by the four "main" vertices generates our 12
         * required triangles.
     */
-    const double pythagorean_length = sqrt(1.0 * pow(cube_parameters.size, 2));
-    struct coord_3d main_vertices[MAIN_VERTEX_COUNT];
+    const double pythagorean_length = sqrt(cube_parameters.size * cube_parameters.size);
+    struct coord_3d main_vertices[MAIN_VERTEX_COUNT] = {};
     int main_vertex_index = 1;
 
     // arbitrarily picking a random point to be one of our "main" vertices

@@ -22,7 +22,7 @@ struct rotation_matrix
 
 struct cube_arguments
 {
-    int size;
+    double size;
     struct coord_3d terminal_size;
     int refresh_rate;
     double x_angle;

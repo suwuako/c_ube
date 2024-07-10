@@ -64,11 +64,13 @@ int main(int argc, char *argv[])
 
     printf("Press enter to continue;\n");
     scanf("%c");
+
     while (true)
     {
         render_frame(cube_parameters, triangles);
         rotate_vertices(cube_vertices, cube_parameters);
         group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
+        scanf("%c");
     }
     return 0;
 }
