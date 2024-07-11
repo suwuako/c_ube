@@ -185,7 +185,7 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
         * that the triangles created by the four "main" vertices generates our 12
         * required triangles.
     */
-    const double pythagorean_length = sqrt(cube_parameters.size * cube_parameters.size);
+    const double pythagorean_length = sqrt(2 * cube_parameters.size * cube_parameters.size);
     struct coord_3d main_vertices[MAIN_VERTEX_COUNT] = {};
     int main_vertex_index = 1;
 
@@ -221,7 +221,7 @@ void get_triangles_from_main_vertices(struct coord_3d main_vertices[MAIN_VERTEX_
             double length = get_vector_length(main_vec);
 
             // weird ass bug where something something floating points don't equal
-            if (abs(cube_side_length - length) < 0.1)
+            if (abs(cube_side_length - length) < 0.01)
             {
                 ajacent_vertices[ajacent_vertex_index] = cube_vertices[vertex];
                 ajacent_vertex_index++;
@@ -263,9 +263,8 @@ void get_main_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
         vec_main_to_point = points_to_vector(main_vertices[0], cube_vertices[i]);
         vec_length = get_vector_length(vec_main_to_point);
 
-
         // weird ass bug where something something floating points don't equal
-        if (abs(vec_length - pythagorean_length) < 0.1)
+        if (abs(vec_length - pythagorean_length) < 0.5)
         {
             main_vertices[*p_main_vertex_index] = cube_vertices[i];
             *p_main_vertex_index += 1;
@@ -350,7 +349,7 @@ void set_singular_vertex(struct coord_3d cube_vertices[VERTEX_COUNT],
         case 2:
             cube_vertices[vertex].z = offset;
             break;
-        */
+            */
 
         // working copy
         case 0:

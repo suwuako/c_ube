@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     {
         print_triangles(triangles);
         print_cube_vertices(cube_vertices);
-        render_frame(cube_parameters, triangles);
+        render_frame(cube_parameters, cube_vertices, triangles);
         rotate_vertices(cube_vertices, cube_parameters);
         group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
         scanf("%c");

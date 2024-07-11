@@ -6,6 +6,7 @@
 #include "misc.h"
 
 void render_frame(struct cube_arguments params,
+                  struct coord_3d cube_vertices[VERTEX_COUNT],
                   struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
 {
     struct coord_3d terminal = params.terminal_size;
@@ -18,7 +19,7 @@ void render_frame(struct cube_arguments params,
             p.x = x;
             p.y = y;
 
-            printf("%c", return_char(p, triangles));
+            printf("%c", return_char(p, cube_vertices, triangles));
         }
         printf("\n");
     }
@@ -27,25 +28,33 @@ void render_frame(struct cube_arguments params,
 // determines which pixel to render
 // helper funciton for render_frame
 char return_char(struct coord_3d point,
+                 struct coord_3d cube_vertices[VERTEX_COUNT],
                  struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
 {
     for (int tri_index = 0; tri_index < TRIANGLE_COUNT; tri_index++)
     {
-        struct coord_3d triangle[TRIANGLE_VERTICES] = {};
+        struct coord_3d triangle_vertex;
+
+        for (int i = 0; i < VERTEX_COUNT; i++)
+        {
+            if (point.x == (int)cube_vertices[i].x && point.y == (int)cube_vertices[i].y)
+            {
+                printf("\033[0;31m%d\033[0m", i);
+                return '\0';
+            }
+        }
 
         for (int i = 0; i < TRIANGLE_VERTICES; i++)
         {
-            triangle[i] = triangles[tri_index][i];
+            triangle_vertex = triangles[tri_index][i];
             //printf("\n%d %lf %lf %lf\n",i, triangle[i].x, triangle[i].y, triangle[i].z);
-            if (point.x == (int)triangle[i].x && point.y == (int)triangle[i].y)
+            if (point.x == (int)triangle_vertex.x && point.y == (int)triangle_vertex.y)
             {
                 return 'x';
             }
 
         }
 
-        
-        
         if (point_in_triangle(point, triangles[tri_index]))
         {
             char return_signal = '0' + tri_index;
