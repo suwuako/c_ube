@@ -10,10 +10,11 @@
 
 /*
     * CLI ARGUMENTS
-    *   --size          / -s dictates the size (length side) of the cube 
-    *   --terminal_x      / -X dictates the size of the terminal (x)
-    *   --terminal_y      / -Y dictates the size of the terminal (x)
-    *   --speed         / -S terminal refresh rate (frames/sec)
+    *   --size          / -S dictates the size (length side) of the cube 
+    *   --terminal_x    / -X dictates the size of the terminal (x)
+    *   --terminal_y    / -Y dictates the size of the terminal (y)
+    *   --terminal_z    / -Z dictates the size of the terminal (z)
+    *   --speed         / -s terminal refresh rate (frames/sec)
     *   -x              / -x x rotation angle amount
     *   -y              / -y y rotation angle amount
     *   -z              / -z z rotation angle amount
@@ -31,6 +32,7 @@
     * - [x] Render triangles
     * - [x] Rotate triangles
     * - [x] frame rate sleep things
+    * - [x] shorthand flags
     * - [ ] have triangles display different characters based off cube face
     *
     * TODO:

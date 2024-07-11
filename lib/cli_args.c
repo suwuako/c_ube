@@ -140,23 +140,28 @@ void assign_cli_args(int argc, char *argv[],
     // ignores arguments that aren't specified in c_ube.c
     for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[i], "--size") == 0) {
+        if (strcmp(argv[i], "--size") == 0 ||
+            strcmp(argv[i], "-S") == 0) {
             p_cli_args->size = atof(argv[i + 1]);
             p_inputted_args->size = 1;
 
-        } else if (strcmp(argv[i], "--terminal_x") == 0) {
+        } else if (strcmp(argv[i], "--terminal_x") == 0 || 
+            strcmp(argv[i], "-X") == 0) {
             p_cli_args->terminal_size.x = atof(argv[i + 1]);
             p_inputted_args->terminal_size.x = 1;
 
-        } else if (strcmp(argv[i], "--terminal_y") == 0) {
+        } else if (strcmp(argv[i], "--terminal_y") == 0 || 
+            strcmp(argv[i], "-Y") == 0) {
             p_cli_args->terminal_size.y = atof(argv[i + 1]);
             p_inputted_args->terminal_size.y = 1;
 
-        } else if (strcmp(argv[i], "--terminal_z") == 0) {
+        } else if (strcmp(argv[i], "--terminal_z") == 0 || 
+            strcmp(argv[i], "-Z") == 0) {
             p_cli_args->terminal_size.z = atof(argv[i + 1]);
             p_inputted_args->terminal_size.z = 1;
 
-        } else if (strcmp(argv[i], "--speed") == 0) {
+        } else if (strcmp(argv[i], "--speed") == 0 || 
+            strcmp(argv[i], "-s") == 0) {
             p_cli_args->refresh_rate = atoi(argv[i + 1]);
             p_inputted_args->refresh_rate = 1;
 
