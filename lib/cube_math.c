@@ -220,7 +220,8 @@ void get_triangles_from_main_vertices(struct coord_3d main_vertices[MAIN_VERTEX_
             struct coord_3d main_vec = points_to_vector(current_vertex, point);
             double length = get_vector_length(main_vec);
 
-            if (cube_side_length == length)
+            // weird ass bug where something something floating points don't equal
+            if (abs(cube_side_length - length) < 0.1)
             {
                 ajacent_vertices[ajacent_vertex_index] = cube_vertices[vertex];
                 ajacent_vertex_index++;
@@ -263,7 +264,8 @@ void get_main_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
         vec_length = get_vector_length(vec_main_to_point);
 
 
-        if (vec_length == pythagorean_length)
+        // weird ass bug where something something floating points don't equal
+        if (abs(vec_length - pythagorean_length) < 0.1)
         {
             main_vertices[*p_main_vertex_index] = cube_vertices[i];
             *p_main_vertex_index += 1;

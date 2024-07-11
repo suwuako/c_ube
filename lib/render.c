@@ -36,6 +36,7 @@ char return_char(struct coord_3d point,
         for (int i = 0; i < TRIANGLE_VERTICES; i++)
         {
             triangle[i] = triangles[tri_index][i];
+            //printf("\n%d %lf %lf %lf\n",i, triangle[i].x, triangle[i].y, triangle[i].z);
             if (point.x == (int)triangle[i].x && point.y == (int)triangle[i].y)
             {
                 return 'x';
@@ -43,13 +44,15 @@ char return_char(struct coord_3d point,
 
         }
 
+        
+        
         if (point_in_triangle(point, triangles[tri_index]))
         {
             char return_signal = '0' + tri_index;
             return return_signal;
         }
     }
-    return '.';
+    return ' ';
 }
 
 // uses barycentric coordinates to determine if a point is within a triangle or not

@@ -79,9 +79,9 @@ void auto_assign_args(struct cube_arguments inputted_args,
     struct coord_3d terminal_size = get_screen_size();
 
     const int REFRESH_RATE = 60;
-    const double X = 1.0;
-    const double Y = 1.0;
-    const double Z = 1.0;
+    const double X = 1;
+    const double Y = 1;
+    const double Z = 1;
 
 
     if (inputted_args.size == 0) 
