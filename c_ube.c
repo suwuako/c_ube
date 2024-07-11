@@ -29,7 +29,8 @@
     * - [x] create cube vertices
     * - [x] convert cube_vertices to triangles
     * - [x] Render triangles
-    * - [ ] Rotate triangles
+    * - [x] Rotate triangles
+    * - [ ] have triangles display different characters based off cube face
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
@@ -40,7 +41,7 @@
     * - [x] Create cube vertices
     * - [x] Link cube vertices into triangles
     * - [x] Render triangles
-    * - [ ] Rotate triangles
+    * - [x] Rotate triangles
     * - [ ] have triangles display different characters based off cube face
     * - [ ] support depth shading
 */
