@@ -1,6 +1,24 @@
 #include <stdio.h>
 
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
+
 #include "datatypes.h"
+
+void sync_refresh_rate(struct cube_arguments params)
+{
+    double sleeps_per_second = 1000 / params.refresh_rate;
+#ifdef _WIN32
+    // run windows sleep
+    Sleep(sleeps_per_second);
+#else
+    // run linux sleep
+    usleep(1000 * sleeps_per_second);
+#endif
+}
 
 void print_cube_params(struct cube_arguments params)
 {
