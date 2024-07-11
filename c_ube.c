@@ -30,11 +30,13 @@
     * - [x] convert cube_vertices to triangles
     * - [x] Render triangles
     * - [x] Rotate triangles
+    * - [x] frame rate sleep things
     * - [ ] have triangles display different characters based off cube face
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
     * (i.e. --size rahhh) then we default to normal size
+    * light source (the sun is shining from 0, 0, terminal_z
     *
     * General TODOS:
     * - [x] Complete cli parsing
@@ -68,12 +70,12 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        print_triangles(triangles);
-        print_cube_vertices(cube_vertices);
         render_frame(cube_parameters, cube_vertices, triangles);
         rotate_vertices(cube_vertices, cube_parameters);
         group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
-        scanf("%c");
+
+        // just acts as a sleep
+        sync_refresh_rate(cube_parameters);
     }
     return 0;
 }

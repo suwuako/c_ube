@@ -44,21 +44,10 @@ char return_char(struct coord_3d point,
             }
         }
 
-        for (int i = 0; i < TRIANGLE_VERTICES; i++)
-        {
-            triangle_vertex = triangles[tri_index][i];
-            //printf("\n%d %lf %lf %lf\n",i, triangle[i].x, triangle[i].y, triangle[i].z);
-            if (point.x == (int)triangle_vertex.x && point.y == (int)triangle_vertex.y)
-            {
-                return 'x';
-            }
-
-        }
-
         if (point_in_triangle(point, triangles[tri_index]))
         {
             char return_signal = '0' + tri_index;
-            return return_signal;
+            return 'o';
         }
     }
     return ' ';
