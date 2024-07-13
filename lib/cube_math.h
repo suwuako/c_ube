@@ -6,6 +6,12 @@
 #include "datatypes.h"
 
 
+void get_normal_vectors(struct coord_3d normal_vectors[6],
+                        struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES]);
+
+double get_pixel_depth(struct coord_3d p,
+                       struct coord_3d triangle[TRIANGLE_VERTICES]);
+
 // rotation functions
 void rotate_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
                      struct cube_arguments cube_parameters);
@@ -24,7 +30,10 @@ struct coord_3d multiply_matrix(double matrix[3][3],
 
 // general vector math functions
 struct coord_3d points_to_vector(struct coord_3d a, struct coord_3d b);
+struct coord_3d cross_product(struct coord_3d triangle[TRIANGLE_VERTICES]);
 double get_vector_length(struct coord_3d vec);
+bool equal_vectors(struct coord_3d vec_a,
+                   struct coord_3d vec_b);
 
 
 // grouping vertices to 12 triangles

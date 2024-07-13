@@ -38,7 +38,7 @@
     * TODO:
     * if invalid CLI args are passed we default to normal args 
     * (i.e. --size rahhh) then we default to normal size
-    * light source (the sun is shining from 0, 0, terminal_z
+    * light source (the sun is shining from 0, 0, terminal_z (not that fesible...)
     *
     * General TODOS:
     * - [x] Complete cli parsing
@@ -47,7 +47,7 @@
     * - [x] Render triangles
     * - [x] Rotate triangles
     * - [ ] have triangles display different characters based off cube face
-    * - [ ] support depth shading
+    * - [ ] support depth shading (not that feasible anymore...)
 */
 
 

@@ -6,7 +6,51 @@
 #include "cube_math.h"
 #include "datatypes.h"
 
+/*
+    * pixel stuff
+ */
+void get_normal_vectors(struct coord_3d normal_vectors[6],
+                        struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
+{
+    int normal_index = 0;
+    for (int i = 0; i < 1 + TRIANGLE_COUNT; i++)
+    {
+        struct coord_3d normal = cross_product(triangles[i]);
+        bool in_normal = false;
 
+        for (int j = 0; j <= normal_index; j++)
+        {
+            if (equal_vectors(normal, normal_vectors[j]))
+            {
+                in_normal = true;
+            }
+        }
+
+        if (!in_normal)
+        {
+        printf("%lf %lf %lf\n", normal.x, normal.y, normal.z);
+            normal_vectors[normal_index] = normal;
+            normal_index += 1;
+        }
+    }
+}
+
+// gets the depth of the pixel from your persepctive
+// (z coordinate) 
+double get_pixel_depth(struct coord_3d p,
+                       struct coord_3d triangle[TRIANGLE_VERTICES])
+{
+    struct coord_3d a = triangle[0];
+    struct coord_3d b = triangle[1];
+    struct coord_3d c = triangle[2];
+
+    double lambda = ((c.x - a.x) * (p.y - a.y) - (c.y - a.y) * (p.x - a.x)) /
+                    ((b.y - a.y) * (c.x - a.x) - (b.x - a.x) * (c.y - a.y));
+    double mu = (p.x - a.x - lambda * (b.x - a.x)) / (c.x - a.x);
+    double z_depth = lambda * (b.z - a.z) - mu * (c.z - a.z);
+
+    return z_depth;
+}
 /*
     * ROTATION MATRIES
 */
@@ -142,6 +186,33 @@ struct rotation_matrix init_rotation_matrices(double x, double y, double z)
 /*
     * VECTOR MATH STUFF
 */
+
+// cross product
+struct coord_3d cross_product(struct coord_3d triangle[TRIANGLE_VERTICES])
+{
+    struct coord_3d ab = points_to_vector(triangle[0], triangle[1]);
+    struct coord_3d ac = points_to_vector(triangle[0], triangle[2]);
+    struct coord_3d cross;
+
+    cross.x = ab.y * ac.z - ab.z * ac.y;
+    cross.y = ab.z * ac.x - ab.x * ac.z;
+    cross.z = ab.x * ac.y - ab.y * ac.x;
+
+    return cross;
+}
+
+bool equal_vectors(struct coord_3d vec_a,
+                   struct coord_3d vec_b)
+{
+    if (abs(vec_a.x - vec_b.x) < 0.1 &&
+        abs(vec_a.y - vec_b.y) < 0.1 &&
+        abs(vec_a.z - vec_b.z) < 0.1)
+    {
+        return true;
+    }
+    return false;
+}
+
 // converts two points into a vector in the form AB
 struct coord_3d points_to_vector(struct coord_3d a, struct coord_3d b)
 {
@@ -185,6 +256,63 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
         * that the triangles created by the four "main" vertices generates our 12
         * required triangles.
     */
+
+    // setting it manually to test winding order
+    // face 1
+    triangles[0][0] = cube_vertices[0];
+    triangles[0][1] = cube_vertices[1];
+    triangles[0][2] = cube_vertices[3];
+
+    triangles[1][0] = cube_vertices[0];
+    triangles[1][1] = cube_vertices[3];
+    triangles[1][2] = cube_vertices[2];
+
+    // face 2
+    triangles[2][0] = cube_vertices[0];
+    triangles[2][1] = cube_vertices[4];
+    triangles[2][2] = cube_vertices[5];
+
+    triangles[3][0] = cube_vertices[0];
+    triangles[3][1] = cube_vertices[5];
+    triangles[3][2] = cube_vertices[1];
+    
+    // face 3
+    triangles[4][0] = cube_vertices[1];
+    triangles[4][1] = cube_vertices[5];
+    triangles[4][2] = cube_vertices[7];
+
+    triangles[5][0] = cube_vertices[1];
+    triangles[5][1] = cube_vertices[7];
+    triangles[5][2] = cube_vertices[3];
+    
+    // face 4
+    triangles[6][0] = cube_vertices[6];
+    triangles[6][1] = cube_vertices[5];
+    triangles[6][2] = cube_vertices[7];
+
+    triangles[7][0] = cube_vertices[6];
+    triangles[7][1] = cube_vertices[4];
+    triangles[7][2] = cube_vertices[5];
+    
+    // face 5
+    triangles[8][0] = cube_vertices[0];
+    triangles[8][1] = cube_vertices[4];
+    triangles[8][2] = cube_vertices[6];
+
+    triangles[9][0] = cube_vertices[0];
+    triangles[9][1] = cube_vertices[6];
+    triangles[9][2] = cube_vertices[2];
+    
+    // face 6
+    triangles[10][0] = cube_vertices[2];
+    triangles[10][1] = cube_vertices[6];
+    triangles[10][2] = cube_vertices[7];
+
+    triangles[11][0] = cube_vertices[2];
+    triangles[11][1] = cube_vertices[7];
+    triangles[11][2] = cube_vertices[3];
+
+    /*
     const double pythagorean_length = sqrt(2 * cube_parameters.size * cube_parameters.size);
     struct coord_3d main_vertices[MAIN_VERTEX_COUNT] = {};
     int main_vertex_index = 1;
@@ -193,7 +321,7 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
     main_vertices[0] = cube_vertices[0];
     get_main_vertices(cube_vertices, main_vertices, &main_vertex_index, pythagorean_length);
     get_triangles_from_main_vertices(main_vertices, cube_vertices, triangles, cube_parameters.size * 1.0);
-
+    */
 }
 
 // helper function for group_vertices_to_triangles
@@ -241,8 +369,8 @@ void get_triangles_from_main_vertices(struct coord_3d main_vertices[MAIN_VERTEX_
             }
 
 
-            triangles[triangle_index][1] = ajacent_vertices[ajacent_vertex];
-            triangles[triangle_index][2] = ajacent_vertices[next_index];
+            triangles[triangle_index][1] = ajacent_vertices[next_index];
+            triangles[triangle_index][2] = ajacent_vertices[ajacent_vertex];
 
             triangle_index += 1;
         }
