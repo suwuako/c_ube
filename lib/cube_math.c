@@ -28,9 +28,19 @@ void get_normal_vectors(struct coord_3d normal_vectors[6],
 
         if (!in_normal)
         {
-        printf("%lf %lf %lf\n", normal.x, normal.y, normal.z);
             normal_vectors[normal_index] = normal;
             normal_index += 1;
+           
+            normal.x = -normal.x;
+            normal.y = -normal.y;
+            normal.z = -normal.z;
+
+            normal_vectors[normal_index] = normal;
+            normal_index += 1;
+        }
+        if (normal_index == 6)
+        {
+            return;
         }
     }
 }
@@ -47,7 +57,7 @@ double get_pixel_depth(struct coord_3d p,
     double lambda = ((c.x - a.x) * (p.y - a.y) - (c.y - a.y) * (p.x - a.x)) /
                     ((b.y - a.y) * (c.x - a.x) - (b.x - a.x) * (c.y - a.y));
     double mu = (p.x - a.x - lambda * (b.x - a.x)) / (c.x - a.x);
-    double z_depth = lambda * (b.z - a.z) - mu * (c.z - a.z);
+    double z_depth = a.z + lambda * (b.z - a.z) + mu * (c.z - a.z);
 
     return z_depth;
 }
@@ -257,6 +267,7 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
         * required triangles.
     */
 
+    /*
     // setting it manually to test winding order
     // face 1
     triangles[0][0] = cube_vertices[0];
@@ -311,8 +322,7 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
     triangles[11][0] = cube_vertices[2];
     triangles[11][1] = cube_vertices[7];
     triangles[11][2] = cube_vertices[3];
-
-    /*
+    */
     const double pythagorean_length = sqrt(2 * cube_parameters.size * cube_parameters.size);
     struct coord_3d main_vertices[MAIN_VERTEX_COUNT] = {};
     int main_vertex_index = 1;
@@ -321,7 +331,6 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
     main_vertices[0] = cube_vertices[0];
     get_main_vertices(cube_vertices, main_vertices, &main_vertex_index, pythagorean_length);
     get_triangles_from_main_vertices(main_vertices, cube_vertices, triangles, cube_parameters.size * 1.0);
-    */
 }
 
 // helper function for group_vertices_to_triangles

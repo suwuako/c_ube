@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include "cube_math.h"
@@ -12,8 +13,12 @@ void render_frame(struct cube_arguments params,
 {
     struct coord_3d terminal = params.terminal_size;
     struct coord_3d normal_vectors[6] = {};
+    double depth_min;
+    double depth_max;
 
     get_normal_vectors(normal_vectors, triangles);
+    get_depth_extremes(triangles, terminal, &depth_min, &depth_max);
+    printf("%lf %lf\n", depth_min, depth_max);
     scanf("%c");
 
     for (int x = 0; x < terminal.x; x++)
@@ -24,50 +29,117 @@ void render_frame(struct cube_arguments params,
             p.x = x;
             p.y = y;
 
-            printf("%c", return_char(p, cube_vertices, triangles, normal_vectors));
+            printf("%c", return_char(p, cube_vertices, triangles, normal_vectors,
+                                     depth_min, depth_max));
         }
         printf("\n");
     }
 }
+
+void get_depth_extremes(struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
+                        struct coord_3d terminal,
+                        double *min, double *max)
+{
+    double global_min = 0;
+    double global_max = 0;
+    double average = 0;
+    int indexed_pixels;
+    for (int x = 0; x < terminal.x; x++)
+    {
+        for (int y = 0; y < terminal.y; y++)
+        {
+            for (int tri = 0; tri < TRIANGLE_COUNT; tri++)
+            {
+                struct coord_3d point;
+                point.x = x;
+                point.y = y;
+
+                if (point_in_triangle(point, triangles[tri]))
+                {
+                    double pixel_depth = get_pixel_depth(point, triangles[tri]);
+                    
+                    average += pixel_depth;
+                    indexed_pixels += 1;
+                    if (pixel_depth > global_max)
+                    {
+                        global_max = pixel_depth;
+                    }
+                    if (pixel_depth < global_min)
+                    {
+                        global_min = pixel_depth;
+                    }
+                }
+            }
+        }
+    }
+    
+    *min = global_min;
+    *max = global_max;
+}
+
 
 // determines which pixel to render
 // helper funciton for render_frame
 char return_char(struct coord_3d point,
                  struct coord_3d cube_vertices[VERTEX_COUNT],
                  struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
-                 struct coord_3d normal_vectors[6])
+                 struct coord_3d normal_vectors[6],
+                 double depth_min, double depth_max)
 {
     // if pixel isnt' on cube we return blank anyways
     char return_signal = ' ';
     char facemap[CUBE_FACES] = {'+', '-', '#', '@', '*', '.'};
-    double depth_buffer = -10000000000000;
     bool in_triangle = false;
+    double depth_buffer = -100000000;
     double highest_tri_index = 0;
     struct coord_3d highest_triangle[TRIANGLE_VERTICES];
+    double pixel_depth;
 
     for (int tri_index = 0; tri_index < TRIANGLE_COUNT; tri_index++)
     {
-        struct coord_3d triangle_vertex;
 
         if (return_vertex(point, cube_vertices)) { return '\0'; }
         // keeps in_triangle true even if subsequent triangles aren't in triangle
         if (!in_triangle) { in_triangle = point_in_triangle(point, triangles[tri_index]); }
 
         // we want to render only what we can see - 
-        double pixel_depth = get_pixel_depth(point, triangles[tri_index]);
+        pixel_depth = get_pixel_depth(point, triangles[tri_index]);
         if (point_in_triangle(point, triangles[tri_index]) && pixel_depth > depth_buffer)
         {
             depth_buffer = pixel_depth;
-            
             highest_tri_index = tri_index;
-            return_signal = get_pixel(highest_triangle, facemap, normal_vectors);
+            
+            highest_triangle[0] = triangles[tri_index][0];
+            highest_triangle[1] = triangles[tri_index][1];
+            highest_triangle[2] = triangles[tri_index][2];
         }
     }
     if (in_triangle)
     {
-        return '0' + highest_tri_index;
+        return_signal = get_pixel(highest_triangle, facemap, normal_vectors);
+        printf("\033[38;5;%dm%c\033[0m", get_pixel_colour(depth_buffer, depth_min, depth_max), 
+               return_signal);
+        return '\0';
     }
     return return_signal;
+}
+
+int get_pixel_colour(double depth, double min, double max)
+{
+    int greyscale_offset = 232;
+    double global_max = max;
+    double increment =  global_max / 24;
+    double curr = min;
+
+    for (int i = 0; i < 24; i++)
+    {
+        if (depth < curr)
+        {
+            return greyscale_offset + i;
+        }
+        curr += increment;
+    }
+    return 100;
 }
 
 char get_pixel(struct coord_3d highest_triangle[TRIANGLE_VERTICES],
