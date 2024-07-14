@@ -2,9 +2,6 @@
 
 a spinning cube implementation written in C
 
-## demo
-![](https://github.com/suwuako/c_ube/blob/main/demo.mp4)
-
 ## command line flags
 
     * CLI ARGUMENTS
