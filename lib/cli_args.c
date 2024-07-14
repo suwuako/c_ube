@@ -84,6 +84,11 @@ void auto_assign_args(struct cube_arguments inputted_args,
     const double Z = 0.03;
 
 
+    if (inputted_args.colour == 0)
+    {
+        int black = 232;
+        p_cli_args->colour = black;
+    }
     if (inputted_args.size == 0) 
     {
         int min_terminal_len;
@@ -140,7 +145,12 @@ void assign_cli_args(int argc, char *argv[],
     // ignores arguments that aren't specified in c_ube.c
     for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[i], "--size") == 0 ||
+        if (strcmp(argv[i], "--colour") == 0 ||
+            strcmp(argv[i], "-c") == 0) {
+            p_cli_args->colour = atoi(argv[i + 1]);
+            p_inputted_args->colour = 1;
+
+        } else if (strcmp(argv[i], "--size") == 0 ||
             strcmp(argv[i], "-S") == 0) {
             p_cli_args->size = atof(argv[i + 1]);
             p_inputted_args->size = 1;

@@ -110,6 +110,7 @@ int get_pixel_shading(double max_depth, double depth,
     struct coord_3d terminal = params.terminal_size;
     double side_length = params.size;
 
+    double base_colour = params.colour;
     double adjusted_depth = (depth);
     double increment = max_depth / 25;
     double current = increment;
@@ -118,12 +119,12 @@ int get_pixel_shading(double max_depth, double depth,
     {
         if (current > adjusted_depth)
         {
-            return black + i;
+            return base_colour + i;
         }
         current += increment;
     }
 
-    return white;
+    return base_colour + 23;
 }
 
 char get_pixel(struct coord_3d highest_triangle[TRIANGLE_VERTICES],

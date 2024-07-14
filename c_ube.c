@@ -10,14 +10,15 @@
 
 /*
     * CLI ARGUMENTS
-    *   --size          / -S dictates the size (length side) of the cube 
-    *   --terminal_x    / -X dictates the size of the terminal (x)
-    *   --terminal_y    / -Y dictates the size of the terminal (y)
-    *   --terminal_z    / -Z dictates the size of the terminal (z)
-    *   --speed         / -s terminal refresh rate (frames/sec)
-    *   -x              / -x x rotation angle amount
-    *   -y              / -y y rotation angle amount
-    *   -z              / -z z rotation angle amount
+    *   --colour        / -c colour (0-256)                                 default: 232 (black)
+    *   --size          / -S dictates the size (length side) of the cube    default: shortest terminal dimension / 2
+    *   --terminal_x    / -X dictates the size of the terminal (x)          default: autodetected
+    *   --terminal_y    / -Y dictates the size of the terminal (y)          default: autodetected
+    *   --terminal_z    / -Z dictates the size of the terminal (z)          default: autodetected
+    *   --speed         / -s terminal refresh rate (frames/sec)             default: 60
+    *   -x              / -x x rotation angle amount                        default: 0.1
+    *   -y              / -y y rotation angle amount                        default: 0.2
+    *   -z              / -z z rotation angle amount                        default: 0.3
  */
 
 /*
