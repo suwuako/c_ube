@@ -13,7 +13,7 @@ void get_normal_vectors(struct coord_3d normal_vectors[6],
                         struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
 {
     int normal_index = 0;
-    for (int i = 0; i < 1 + TRIANGLE_COUNT; i++)
+    for (int i = 0; i < TRIANGLE_COUNT; i++)
     {
         struct coord_3d normal = cross_product(triangles[i]);
         bool in_normal = false;
@@ -38,6 +38,7 @@ void get_normal_vectors(struct coord_3d normal_vectors[6],
             normal_vectors[normal_index] = normal;
             normal_index += 1;
         }
+
         if (normal_index == 6)
         {
             return;
@@ -267,7 +268,6 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
         * required triangles.
     */
 
-    /*
     // setting it manually to test winding order
     // face 1
     triangles[0][0] = cube_vertices[0];
@@ -322,7 +322,8 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
     triangles[11][0] = cube_vertices[2];
     triangles[11][1] = cube_vertices[7];
     triangles[11][2] = cube_vertices[3];
-    */
+
+    /*
     const double pythagorean_length = sqrt(2 * cube_parameters.size * cube_parameters.size);
     struct coord_3d main_vertices[MAIN_VERTEX_COUNT] = {};
     int main_vertex_index = 1;
@@ -331,6 +332,7 @@ void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
     main_vertices[0] = cube_vertices[0];
     get_main_vertices(cube_vertices, main_vertices, &main_vertex_index, pythagorean_length);
     get_triangles_from_main_vertices(main_vertices, cube_vertices, triangles, cube_parameters.size * 1.0);
+    */
 }
 
 // helper function for group_vertices_to_triangles
