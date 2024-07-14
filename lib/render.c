@@ -52,7 +52,7 @@ void render_frame(struct cube_arguments params,
             p.x = x;
             p.y = y;
 
-            print_char(p, cube_vertices, triangles, normal_vectors, max_depth);
+            print_char(params, p, cube_vertices, triangles, normal_vectors, max_depth);
         }
         printf("\n");
     }
@@ -61,11 +61,10 @@ void render_frame(struct cube_arguments params,
 
 // determines which pixel to render
 // helper funciton for render_frame
-void print_char(struct coord_3d point,
+void print_char(struct cube_arguments params, struct coord_3d point,
                  struct coord_3d cube_vertices[VERTEX_COUNT],
                  struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
-                 struct coord_3d normal_vectors[6],
-                 double max_depth)
+                 struct coord_3d normal_vectors[6], double max_depth)
 {
     // if pixel isnt' on cube we return blank anyways
     char pixel = ' ';
@@ -99,60 +98,33 @@ void print_char(struct coord_3d point,
         pixel = get_pixel(highest_triangle, facemap, normal_vectors);
     }
 
-    printf("\033[38;5;%dm%c\033[0m", get_pixel_shading(max_depth, depth_buffer), pixel);
+    printf("\033[38;5;%dm%c\033[0m", get_pixel_shading(max_depth, depth_buffer, params), pixel);
 }
 
-int get_pixel_shading(double max_depth, double depth)
+int get_pixel_shading(double max_depth, double depth,
+                      struct cube_arguments params)
 {
     int black = 232;
     int white = 255; // subtracting from 256 will result in darker tones
-    double increment = max_depth / 24;
+
+    struct coord_3d terminal = params.terminal_size;
+    double side_length = params.size;
+
+    double adjusted_depth = (depth);
+    double increment = max_depth / 25;
     double current = increment;
 
-    double adjustment = 0;
-    int i = 0;
-    while (current < depth)
+    for (int i = 0; i < 24; i++)
     {
+        if (current > adjusted_depth)
+        {
+            return black + i;
+        }
         current += increment;
-        i += 1;
-        adjustment += i / 2;
     }
 
-    // make there be less appearlances between 240 and 250 since its really ahrd to find the different greys
-    // hard coded in but not sure if theres a better way
-    // eww so gross
-    if (i < 16)
-    {
-        return black + i * 0.15;
-    }
-    if (i < 17)
-    {
-        return black + i * 0.3;
-    }
-    if (i < 18)
-    {
-        return black + i * 0.4;
-    }
-    if (i < 19)
-    {
-        return black + i * 0.7;
-    }
-    if (i < 20)
-    {
-        return black + i * 0.8;
-    }
-    if (i < 21)
-    {
-        return black + i * 0.9;
-    }
-    if (i < 22)
-    {
-        return black + i * 0.95;
-    }
-
-    return black + i;
+    return white;
 }
-
 
 char get_pixel(struct coord_3d highest_triangle[TRIANGLE_VERTICES],
                char facemap[CUBE_FACES],
