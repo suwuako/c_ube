@@ -3,7 +3,7 @@
 a spinning cube implementation written in C
 
 ## demo
-![](./demo.mp4)
+![](https://github.com/suwuako/c_ube/blob/main/demo.mp4)
 
 ## command line flags
 
