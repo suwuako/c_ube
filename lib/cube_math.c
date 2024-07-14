@@ -1,9 +1,419 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include "cube_math.h"
 #include "datatypes.h"
 
+/*
+    * pixel stuff
+ */
+void get_normal_vectors(struct coord_3d normal_vectors[6],
+                        struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
+{
+    int normal_index = 0;
+    for (int i = 0; i < TRIANGLE_COUNT; i++)
+    {
+        struct coord_3d normal = cross_product(triangles[i]);
+        bool in_normal = false;
+
+        for (int j = 0; j <= normal_index; j++)
+        {
+            if (equal_vectors(normal, normal_vectors[j]))
+            {
+                in_normal = true;
+            }
+        }
+
+        if (!in_normal)
+        {
+            normal_vectors[normal_index] = normal;
+            normal_index += 1;
+           
+            normal.x = -normal.x;
+            normal.y = -normal.y;
+            normal.z = -normal.z;
+
+            normal_vectors[normal_index] = normal;
+            normal_index += 1;
+        }
+
+        if (normal_index == 6)
+        {
+            return;
+        }
+    }
+}
+
+// gets the depth of the pixel from your persepctive
+// (z coordinate) 
+double get_pixel_depth(struct coord_3d p,
+                       struct coord_3d triangle[TRIANGLE_VERTICES])
+{
+    struct coord_3d a = triangle[0];
+    struct coord_3d b = triangle[1];
+    struct coord_3d c = triangle[2];
+
+    double lambda = ((c.x - a.x) * (p.y - a.y) - (c.y - a.y) * (p.x - a.x)) /
+                    ((b.y - a.y) * (c.x - a.x) - (b.x - a.x) * (c.y - a.y));
+    double mu = (p.x - a.x - lambda * (b.x - a.x)) / (c.x - a.x);
+    double z_depth = a.z + lambda * (b.z - a.z) + mu * (c.z - a.z);
+
+    return z_depth;
+}
+/*
+    * ROTATION MATRIES
+*/
+// rotates the 8 points of the cube
+void rotate_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                     struct cube_arguments cube_parameters)
+{
+    double x_angle = cube_parameters.x_angle;
+    double y_angle = cube_parameters.y_angle;
+    double z_angle = cube_parameters.z_angle;
+    struct coord_3d terminal = cube_parameters.terminal_size;
+    struct rotation_matrix rotate = init_rotation_matrices(x_angle, y_angle, z_angle);
+
+    // transform each point based back to its origin
+    transform_vertices(cube_vertices, terminal, true);
+    multiply_rotation_matrices(cube_vertices, rotate);
+    transform_vertices(cube_vertices, terminal, false);
+}
+
+// multiplies rotation matrices
+// helper function for rotation_vertices
+void multiply_rotation_matrices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                                struct rotation_matrix matrix)
+{
+    for (int vertex = 0; vertex < VERTEX_COUNT; vertex++)
+    {
+        struct coord_3d rotated_point;
+
+        rotated_point = multiply_matrix(matrix.x_rotate, cube_vertices[vertex]);
+        rotated_point = multiply_matrix(matrix.y_rotate, rotated_point);
+        rotated_point = multiply_matrix(matrix.z_rotate, rotated_point);
+
+        cube_vertices[vertex].x = rotated_point.x;
+        cube_vertices[vertex].y = rotated_point.y;
+        cube_vertices[vertex].z = rotated_point.z;
+
+    }
+}
+
+struct coord_3d multiply_matrix(double matrix[3][3],
+                                struct coord_3d point)
+{
+    /*
+     * | a b c |     | x |   | ax + by + cz |
+     * | d e f |  x  | y | = | dx + ey + fz |
+     * | g h i |     | z |   | gx + hy + iz |
+     */
+
+    struct coord_3d return_point;
+    double point_arr[3];
+    double new_point[3];
+
+    point_arr[0] = point.x;
+    point_arr[1] = point.y;
+    point_arr[2] = point.z;
+
+    for (int row = 0; row < 3; row++)
+    {
+        double sum = 0;
+        for (int col = 0; col < 3; col++)
+        {
+            sum += matrix[row][col] * point_arr[col];
+        }
+        new_point[row] = sum;
+    }
+
+    return_point.x = new_point[0];
+    return_point.y = new_point[1];
+    return_point.z = new_point[2];
+
+    return return_point;
+}
+
+// transforms vertices to the origin (0,0,0) or away (centre_x, centre_y, centre_z)
+// towards_origin = true -> 0, 0, 0; towards_origin = false -> centres
+void transform_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                        struct coord_3d terminal, bool towards_origin)
+{
+    struct coord_3d center;
+    center.x = terminal.x / 2;
+    center.y = terminal.y / 2;
+    center.z = terminal.z / 2;
+
+    for (int i = 0; i < VERTEX_COUNT; i++)
+    {
+        if (towards_origin)
+        {
+            cube_vertices[i].x -= center.x;
+            cube_vertices[i].y -= center.y;
+            cube_vertices[i].z -= center.z;
+        } else {
+            cube_vertices[i].x += center.x;
+            cube_vertices[i].y += center.y;
+            cube_vertices[i].z += center.z;
+        }
+    }
+}
+
+struct rotation_matrix init_rotation_matrices(double x, double y, double z)
+{
+    struct rotation_matrix matrix;
+    double x_rotate[3][3] = {
+        {1,             0,          0},
+        {0,             cos(x), -sin(x)},
+        {0,             sin(x), cos(x)}
+    };
+
+    double y_rotate[3][3] = {
+        {cos(y),    0,          sin(y)  },
+        {0,             1,          0           },
+        {-sin(y),   0,          cos(y)  }
+    };
+
+    double z_rotate[3][3] = {
+        {cos(z),  -sin(z),    0},
+        {sin(z),  cos(z),     0},
+        {0,           0,              1}
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            matrix.x_rotate[i][j] = x_rotate[i][j];
+            matrix.y_rotate[i][j] = y_rotate[i][j];
+            matrix.z_rotate[i][j] = z_rotate[i][j];
+        }
+    }
+    
+    return matrix;
+}
+
+/*
+    * VECTOR MATH STUFF
+*/
+
+// cross product
+struct coord_3d cross_product(struct coord_3d triangle[TRIANGLE_VERTICES])
+{
+    struct coord_3d ab = points_to_vector(triangle[0], triangle[1]);
+    struct coord_3d ac = points_to_vector(triangle[0], triangle[2]);
+    struct coord_3d cross;
+
+    cross.x = ab.y * ac.z - ab.z * ac.y;
+    cross.y = ab.z * ac.x - ab.x * ac.z;
+    cross.z = ab.x * ac.y - ab.y * ac.x;
+
+    return cross;
+}
+
+bool equal_vectors(struct coord_3d vec_a,
+                   struct coord_3d vec_b)
+{
+    if (abs(vec_a.x - vec_b.x) < 0.1 &&
+        abs(vec_a.y - vec_b.y) < 0.1 &&
+        abs(vec_a.z - vec_b.z) < 0.1)
+    {
+        return true;
+    }
+    return false;
+}
+
+// converts two points into a vector in the form AB
+struct coord_3d points_to_vector(struct coord_3d a, struct coord_3d b)
+{
+    // we are creating vector AB (b - a);
+    struct coord_3d vector;
+    vector.x = b.x - a.x;
+    vector.y = b.y - a.y;
+    vector.z = b.z - a.z;
+
+    return vector;
+}
+
+// gets the length of a vector
+double get_vector_length(struct coord_3d vec)
+{
+    double length;
+
+    length = sqrt(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2));
+    return length;
+}
+
+
+/*
+    * TRIANGLE SECTION
+*/
+// groups the 8 vertices of the cube into
+// the 12 triangles that make up our cube
+void group_vertices_to_triangles(struct coord_3d cube_vertices[VERTEX_COUNT],
+                                 struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
+                                 struct cube_arguments cube_parameters)
+{
+    /* Grouping vertices into triangles
+        * Fortunately, theres a very easy way (and geometric) way to group
+        * the vertices of a cube into 12 triangles that make up a cube. 
+        * 
+        * Consider picking a random vertex of a cube at random. Connecting
+        * to that vertex are three adacent vertices that make up the edge 
+        * of a cube. connecting any two of those three vertices with our chosen
+        * vertex creates our cube. If we then search for vertices that lie with
+        * exactly the pythagorean length of the edges of the square, we can see 
+        * that the triangles created by the four "main" vertices generates our 12
+        * required triangles.
+    */
+
+    // setting it manually to test winding order
+    // face 1
+    triangles[0][0] = cube_vertices[0];
+    triangles[0][1] = cube_vertices[1];
+    triangles[0][2] = cube_vertices[3];
+
+    triangles[1][0] = cube_vertices[0];
+    triangles[1][1] = cube_vertices[3];
+    triangles[1][2] = cube_vertices[2];
+
+    // face 2
+    triangles[2][0] = cube_vertices[0];
+    triangles[2][1] = cube_vertices[4];
+    triangles[2][2] = cube_vertices[5];
+
+    triangles[3][0] = cube_vertices[0];
+    triangles[3][1] = cube_vertices[5];
+    triangles[3][2] = cube_vertices[1];
+    
+    // face 3
+    triangles[4][0] = cube_vertices[1];
+    triangles[4][1] = cube_vertices[5];
+    triangles[4][2] = cube_vertices[7];
+
+    triangles[5][0] = cube_vertices[1];
+    triangles[5][1] = cube_vertices[7];
+    triangles[5][2] = cube_vertices[3];
+    
+    // face 4
+    triangles[6][0] = cube_vertices[6];
+    triangles[6][1] = cube_vertices[5];
+    triangles[6][2] = cube_vertices[7];
+
+    triangles[7][0] = cube_vertices[6];
+    triangles[7][1] = cube_vertices[4];
+    triangles[7][2] = cube_vertices[5];
+    
+    // face 5
+    triangles[8][0] = cube_vertices[0];
+    triangles[8][1] = cube_vertices[4];
+    triangles[8][2] = cube_vertices[6];
+
+    triangles[9][0] = cube_vertices[0];
+    triangles[9][1] = cube_vertices[6];
+    triangles[9][2] = cube_vertices[2];
+    
+    // face 6
+    triangles[10][0] = cube_vertices[2];
+    triangles[10][1] = cube_vertices[6];
+    triangles[10][2] = cube_vertices[7];
+
+    triangles[11][0] = cube_vertices[2];
+    triangles[11][1] = cube_vertices[7];
+    triangles[11][2] = cube_vertices[3];
+
+    /*
+    const double pythagorean_length = sqrt(2 * cube_parameters.size * cube_parameters.size);
+    struct coord_3d main_vertices[MAIN_VERTEX_COUNT] = {};
+    int main_vertex_index = 1;
+
+    // arbitrarily picking a random point to be one of our "main" vertices
+    main_vertices[0] = cube_vertices[0];
+    get_main_vertices(cube_vertices, main_vertices, &main_vertex_index, pythagorean_length);
+    get_triangles_from_main_vertices(main_vertices, cube_vertices, triangles, cube_parameters.size * 1.0);
+    */
+}
+
+// helper function for group_vertices_to_triangles
+// using our main vertices, we expand outwards and group
+// alterative vertices into triangles
+void get_triangles_from_main_vertices(struct coord_3d main_vertices[MAIN_VERTEX_COUNT],
+                                      struct coord_3d cube_vertices[VERTEX_COUNT],
+                                      struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
+                                      double cube_side_length)
+{
+    int triangle_index = 0;
+
+    // iterates through each main vertex
+    for (int main_vertex = 0; main_vertex < MAIN_VERTEX_COUNT; main_vertex++)
+    {
+        struct coord_3d current_vertex = main_vertices[main_vertex];
+        struct coord_3d ajacent_vertices[TRIANGLE_VERTICES] = {};
+        int ajacent_vertex_index = 0;
+
+        // gets all ajacent vertices of each vertex
+        for (int vertex = 0; vertex < VERTEX_COUNT; vertex++)
+        {
+            struct coord_3d point = cube_vertices[vertex];
+            struct coord_3d main_vec = points_to_vector(current_vertex, point);
+            double length = get_vector_length(main_vec);
+
+            // weird ass bug where something something floating points don't equal
+            if (abs(cube_side_length - length) < 0.01)
+            {
+                ajacent_vertices[ajacent_vertex_index] = cube_vertices[vertex];
+                ajacent_vertex_index++;
+            }
+        }
+
+        // assigns combinations of ajacent vertices to triangles
+        for (int ajacent_vertex = 0; ajacent_vertex < TRIANGLE_VERTICES; ajacent_vertex++)
+        {
+            // first coordinate is always the main vertex
+            triangles[triangle_index][0] = current_vertex;
+
+            int next_index = ajacent_vertex + 1;
+            if (next_index > 2)
+            {
+                next_index = 0;
+            }
+
+
+            triangles[triangle_index][1] = ajacent_vertices[next_index];
+            triangles[triangle_index][2] = ajacent_vertices[ajacent_vertex];
+
+            triangle_index += 1;
+        }
+    }
+}
+
+// helper funciton for group_vertices_to_triangles
+// gets our main vertices (explained in function above)
+void get_main_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
+                       struct coord_3d main_vertices[MAIN_VERTEX_COUNT],
+                       int *p_main_vertex_index, double pythagorean_length)
+{
+    for (int i = 0; i < VERTEX_COUNT; i++)
+    {
+        struct coord_3d vec_main_to_point = {};
+        double vec_length;
+
+        vec_main_to_point = points_to_vector(main_vertices[0], cube_vertices[i]);
+        vec_length = get_vector_length(vec_main_to_point);
+
+        // weird ass bug where something something floating points don't equal
+        if (abs(vec_length - pythagorean_length) < 0.5)
+        {
+            main_vertices[*p_main_vertex_index] = cube_vertices[i];
+            *p_main_vertex_index += 1;
+        }
+    }
+}
+
+/*
+    * CUBE VERTEX
+*/
 // creates the 8 coordinates of the cube
 void create_cube_vertices(struct coord_3d cube_vertices[VERTEX_COUNT],
                           struct cube_arguments cube_parameters)
@@ -67,6 +477,20 @@ void set_singular_vertex(struct coord_3d cube_vertices[VERTEX_COUNT],
 
     switch (axis)
     {
+        /*
+        // debug version without terminal_centers
+        case 0:
+            cube_vertices[vertex].x = offset;
+            break;
+        case 1:
+            cube_vertices[vertex].y = offset;
+            break;
+        case 2:
+            cube_vertices[vertex].z = offset;
+            break;
+            */
+
+        // working copy
         case 0:
             cube_vertices[vertex].x = offset + terminal_center.x;
             break;

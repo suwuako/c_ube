@@ -79,11 +79,16 @@ void auto_assign_args(struct cube_arguments inputted_args,
     struct coord_3d terminal_size = get_screen_size();
 
     const int REFRESH_RATE = 60;
-    const double X = 1.0;
-    const double Y = 1.0;
-    const double Z = 1.0;
+    const double X = 0.01;
+    const double Y = 0.02;
+    const double Z = 0.03;
 
 
+    if (inputted_args.colour == 0)
+    {
+        int black = 232;
+        p_cli_args->colour = black;
+    }
     if (inputted_args.size == 0) 
     {
         int min_terminal_len;
@@ -140,23 +145,33 @@ void assign_cli_args(int argc, char *argv[],
     // ignores arguments that aren't specified in c_ube.c
     for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[i], "--size") == 0) {
-            p_cli_args->size = atoi(argv[i + 1]);
+        if (strcmp(argv[i], "--colour") == 0 ||
+            strcmp(argv[i], "-c") == 0) {
+            p_cli_args->colour = atoi(argv[i + 1]);
+            p_inputted_args->colour = 1;
+
+        } else if (strcmp(argv[i], "--size") == 0 ||
+            strcmp(argv[i], "-S") == 0) {
+            p_cli_args->size = atof(argv[i + 1]);
             p_inputted_args->size = 1;
 
-        } else if (strcmp(argv[i], "--terminal_x") == 0) {
+        } else if (strcmp(argv[i], "--terminal_x") == 0 || 
+            strcmp(argv[i], "-X") == 0) {
             p_cli_args->terminal_size.x = atof(argv[i + 1]);
             p_inputted_args->terminal_size.x = 1;
 
-        } else if (strcmp(argv[i], "--terminal_y") == 0) {
+        } else if (strcmp(argv[i], "--terminal_y") == 0 || 
+            strcmp(argv[i], "-Y") == 0) {
             p_cli_args->terminal_size.y = atof(argv[i + 1]);
             p_inputted_args->terminal_size.y = 1;
 
-        } else if (strcmp(argv[i], "--terminal_z") == 0) {
+        } else if (strcmp(argv[i], "--terminal_z") == 0 || 
+            strcmp(argv[i], "-Z") == 0) {
             p_cli_args->terminal_size.z = atof(argv[i + 1]);
             p_inputted_args->terminal_size.z = 1;
 
-        } else if (strcmp(argv[i], "--speed") == 0) {
+        } else if (strcmp(argv[i], "--speed") == 0 || 
+            strcmp(argv[i], "-s") == 0) {
             p_cli_args->refresh_rate = atoi(argv[i + 1]);
             p_inputted_args->refresh_rate = 1;
 

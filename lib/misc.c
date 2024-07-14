@@ -1,11 +1,29 @@
 #include <stdio.h>
 
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif
+
 #include "datatypes.h"
+
+void sync_refresh_rate(struct cube_arguments params)
+{
+    double sleeps_per_second = 1000 / params.refresh_rate;
+#ifdef _WIN32
+    // run windows sleep
+    Sleep(sleeps_per_second);
+#else
+    // run linux sleep
+    usleep(1000 * sleeps_per_second);
+#endif
+}
 
 void print_cube_params(struct cube_arguments params)
 {
     printf("\n=== c_ube arguments ===\n \n");
-    printf("size: %d\n", params.size);
+    printf("size: %lf\n", params.size);
     printf("terminal x: %lf\n", params.terminal_size.x);
     printf("terminal y: %lf\n", params.terminal_size.y);
     printf("terminal z: %lf\n", params.terminal_size.z);
@@ -20,6 +38,25 @@ void print_cube_vertices(struct coord_3d cube_vertices[VERTEX_COUNT])
     printf("\n \n \n=== c_ube vertices ===\n \n");
     for (int i = 0; i < VERTEX_COUNT; i++)
     {
-        printf("(%lf, %lf, %lf)\n", cube_vertices[i].x, cube_vertices[i].y, cube_vertices[i].z);
+        printf("(%d, %d, %d)\n", (int)cube_vertices[i].x, (int)cube_vertices[i].y, (int)cube_vertices[i].z);
     }
+}
+
+void print_triangles(struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
+{
+    printf("\n \n \n=== c_ube triangles ===\n \n");
+    for (int i = 0; i < TRIANGLE_COUNT; i++)
+    {
+        printf("\nTriangle %d: ", i);
+        for (int j = 0; j < TRIANGLE_VERTICES; j++)
+        {
+            printf("(%d, %d, %d)", (int)triangles[i][j].x, (int)triangles[i][j].y, (int)triangles[i][j].z);
+            if (j != 2)
+            {
+                printf(", ");
+            }
+        }
+    }
+
+    printf("\n \n");
 }
