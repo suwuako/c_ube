@@ -29,7 +29,7 @@ Currently working on:
  - [x] frame rate sleep things
  - [x] shorthand flags
  - [x] have triangles display different characters based off cube face
- - [x] support depth shading (not that feasible anymore...)
+ - [x] support depth shading (not that feasible anymore...) nvm i did it lol
 
 ## installation / compilation
 
