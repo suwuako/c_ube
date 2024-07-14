@@ -3,7 +3,7 @@
 a spinning cube implementation written in C
 
 ## demo
-![](demo.mp4)
+![](./demo.mp4)
 
 ## command line flags
 
