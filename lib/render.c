@@ -7,16 +7,41 @@
 #include "datatypes.h"
 #include "misc.h"
 
+
+double get_max_depth(struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
+                     struct coord_3d terminal)
+{
+    double greatest_depth = 0;
+    for (int x = 0; x < terminal.x; x++)
+    {
+        for (int y = 0; y < terminal.y; y++)
+        {
+            for (int tri = 0; tri < TRIANGLE_COUNT; tri++)
+            {
+                struct coord_3d p;
+                p.x = x;
+                p.y = y;
+
+                double depth = get_pixel_depth(p, triangles[tri]);
+                if (depth > greatest_depth && point_in_triangle(p, triangles[tri]))
+                {
+                    greatest_depth = depth;
+                }
+            }
+        }
+    }
+
+    return greatest_depth;
+}
 void render_frame(struct cube_arguments params,
                   struct coord_3d cube_vertices[VERTEX_COUNT],
                   struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
 {
     struct coord_3d terminal = params.terminal_size;
     struct coord_3d normal_vectors[6] = {};
+    double max_depth = get_max_depth(triangles, terminal);
 
     get_normal_vectors(normal_vectors, triangles);
-
-    scanf("%c");
 
     // optimisations required to render at larger resolutions without screen splitting
     for (int x = 0; x < terminal.x; x++)
@@ -27,7 +52,7 @@ void render_frame(struct cube_arguments params,
             p.x = x;
             p.y = y;
 
-            printf("%c", return_char(p, cube_vertices, triangles, normal_vectors));
+            print_char(p, cube_vertices, triangles, normal_vectors, max_depth);
         }
         printf("\n");
     }
@@ -36,14 +61,15 @@ void render_frame(struct cube_arguments params,
 
 // determines which pixel to render
 // helper funciton for render_frame
-char return_char(struct coord_3d point,
+void print_char(struct coord_3d point,
                  struct coord_3d cube_vertices[VERTEX_COUNT],
                  struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES],
-                 struct coord_3d normal_vectors[6])
+                 struct coord_3d normal_vectors[6],
+                 double max_depth)
 {
     // if pixel isnt' on cube we return blank anyways
-    char return_signal = ' ';
-    char facemap[CUBE_FACES] = {'+', '-', '#', '|', '.', '?'};
+    char pixel = ' ';
+    char facemap[CUBE_FACES] = {'+', '-', '#', '|', '/', '?'};
 
     bool in_triangle = false;
     double depth_buffer = 0;
@@ -52,7 +78,7 @@ char return_char(struct coord_3d point,
 
     for (int tri_index = 0; tri_index < TRIANGLE_COUNT; tri_index++)
     {
-        if (return_vertex(point, cube_vertices)) { return '\0'; }
+        if (return_vertex(point, cube_vertices)) { return; }
         // keeps in_triangle true even if subsequent triangles aren't in triangle
         if (!in_triangle) { in_triangle = point_in_triangle(point, triangles[tri_index]); }
 
@@ -65,14 +91,66 @@ char return_char(struct coord_3d point,
             highest_triangle[0] = triangles[tri_index][0];
             highest_triangle[1] = triangles[tri_index][1];
             highest_triangle[2] = triangles[tri_index][2];
-        return_signal = get_pixel(highest_triangle, facemap, normal_vectors);
         }
     }
+
     if (in_triangle)
     {
-        return_signal = get_pixel(highest_triangle, facemap, normal_vectors);
+        pixel = get_pixel(highest_triangle, facemap, normal_vectors);
     }
-    return return_signal;
+
+    printf("\033[38;5;%dm%c\033[0m", get_pixel_shading(max_depth, depth_buffer), pixel);
+}
+
+int get_pixel_shading(double max_depth, double depth)
+{
+    int black = 232;
+    int white = 255; // subtracting from 256 will result in darker tones
+    double increment = max_depth / 24;
+    double current = increment;
+
+    double adjustment = 0;
+    int i = 0;
+    while (current < depth)
+    {
+        current += increment;
+        i += 1;
+        adjustment += i / 2;
+    }
+
+    // make there be less appearlances between 240 and 250 since its really ahrd to find the different greys
+    // hard coded in but not sure if theres a better way
+    // eww so gross
+    if (i < 16)
+    {
+        return black;
+    }
+    if (i < 17)
+    {
+        return black + i * 0.4;
+    }
+    if (i < 18)
+    {
+        return black + i * 0.5;
+    }
+    if (i < 19)
+    {
+        return black + i * 0.7;
+    }
+    if (i < 20)
+    {
+        return black + i * 0.8;
+    }
+    if (i < 21)
+    {
+        return black + i * 0.9;
+    }
+    if (i < 22)
+    {
+        return black + i * 0.95;
+    }
+
+    return black + i;
 }
 
 
@@ -89,6 +167,7 @@ char get_pixel(struct coord_3d highest_triangle[TRIANGLE_VERTICES],
             return facemap[i];
         }
     }
+    return 'i';
 }
 
 
