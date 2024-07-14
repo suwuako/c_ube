@@ -123,15 +123,15 @@ int get_pixel_shading(double max_depth, double depth)
     // eww so gross
     if (i < 16)
     {
-        return black;
+        return black + i * 0.15;
     }
     if (i < 17)
     {
-        return black + i * 0.4;
+        return black + i * 0.3;
     }
     if (i < 18)
     {
-        return black + i * 0.5;
+        return black + i * 0.4;
     }
     if (i < 19)
     {

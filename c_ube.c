@@ -33,7 +33,8 @@
     * - [x] Rotate triangles
     * - [x] frame rate sleep things
     * - [x] shorthand flags
-    * - [ ] have triangles display different characters based off cube face
+    * - [x] have triangles display different characters based off cube face
+    * - [x] support depth shading (not that feasible anymore...)
     *
     * TODO:
     * if invalid CLI args are passed we default to normal args 
@@ -46,8 +47,8 @@
     * - [x] Link cube vertices into triangles
     * - [x] Render triangles
     * - [x] Rotate triangles
-    * - [ ] have triangles display different characters based off cube face
-    * - [ ] support depth shading (not that feasible anymore...)
+    * - [x] have triangles display different characters based off cube face
+    * - [x] support depth shading (not that feasible anymore...)
 */
 
 
