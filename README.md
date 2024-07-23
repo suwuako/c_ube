@@ -2,7 +2,7 @@
 a spinning cube implementation written in C
 
 ## Demo
-![demo](<https://github.com/suwuako/c_ube/blob/main/output.gif)
+![demo](<https://github.com/suwuako/c_ube/blob/main/output.gif>)
 
 ## command line flags
 
