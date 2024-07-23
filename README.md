@@ -12,7 +12,7 @@ ensure you have `make` installed - fairly certain this project is compatible wit
 
 run `make` and you can run, rename or move `bin-c_ube.out` into `/usr/bin/`
 
-alternatively, binaries are included in releases [here](<https://github.com/suwuako/c_ube/releases/tag/v0.0>) (HIGHLY RECCOMENDED TO USE THE RELEASES VERSION INSTEAD) or in the repo itself [here](<https://github.com/suwuako/c_ube/tree/main/binaries>)
+alternatively, binaries are included in releases [here](<https://github.com/suwuako/c_ube/releases>) (HIGHLY RECCOMENDED TO USE THE RELEASES VERSION INSTEAD) or in the repo itself [here](<https://github.com/suwuako/c_ube/tree/main/binaries>)
 
 
 ## command line flags
