@@ -59,18 +59,18 @@ int main(int argc, char *argv[])
     // are defined in lib/cli_args.c
     struct cube_arguments cube_parameters;
     cube_parameters = parse_cli_args(argc, argv);
-    print_cube_params(cube_parameters);
+    //print_cube_params(cube_parameters);
 
     struct coord_3d cube_vertices[VERTEX_COUNT];
     create_cube_vertices(cube_vertices, cube_parameters);
-    print_cube_vertices(cube_vertices);
+    // print_cube_vertices(cube_vertices);
 
     struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES];
     group_vertices_to_triangles(cube_vertices, triangles, cube_parameters);
-    print_triangles(triangles);
+    // print_triangles(triangles);
 
-    printf("Press enter to continue;\n");
-    scanf("%c");
+    // printf("Press enter to continue;\n");
+    // scanf("%c");
 
     while (true)
     {

@@ -7,7 +7,7 @@
 #include "datatypes.h"
 
 /*
-    * pixel stuff
+    * pixel stufg
  */
 void get_normal_vectors(struct coord_3d normal_vectors[6],
                         struct coord_3d triangles[TRIANGLE_COUNT][TRIANGLE_VERTICES])
