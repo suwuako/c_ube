@@ -1,8 +1,19 @@
 # c_ube
 a spinning cube implementation written in C
 
+
 ## Demo
 ![demo](<https://github.com/suwuako/c_ube/blob/main/output.gif>)
+
+
+## installation / compilation
+
+ensure you have `make` installed - fairly certain this project is compatible with windows but no promises ;)
+
+run `make` and you can run, rename or move `bin-c_ube.out` into `/usr/bin/`
+
+alternatively, binaries are included in releases [here](<https://github.com/suwuako/c_ube/releases/tag/v0.0>) (HIGHLY RECCOMENDED TO USE THE RELEASES VERSION INSTEAD) or in the repo itself [here](<https://github.com/suwuako/c_ube/tree/main/binaries>)
+
 
 ## command line flags
 
@@ -16,6 +27,7 @@ a spinning cube implementation written in C
     *   -x              / -x x rotation angle amount                        default: 0.1
     *   -y              / -y y rotation angle amount                        default: 0.2
     *   -z              / -z z rotation angle amount                        default: 0.3
+
 
 ## todos
 Currently working on:
@@ -32,11 +44,3 @@ Currently working on:
  - [x] shorthand flags
  - [x] have triangles display different characters based off cube face
  - [x] support depth shading (not that feasible anymore...) nvm i did it lol
-
-## installation / compilation
-
-ensure you have `make` installed - fairly certain this project is compatible with windows but no promises ;)
-
-run `make` and you can run, rename or move `bin-c_ube.out` into `/usr/bin/`
-
-alternatively, binaries are included [here](<https://github.com/suwuako/c_ube/tree/main/binaries>)
