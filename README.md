@@ -36,6 +36,7 @@ Currently working on:
 ## installation / compilation
 
 ensure you have `make` installed - fairly certain this project is compatible with windows but no promises ;)
+
 run `make` and you can run, rename or move `bin-c_ube.out` into `/usr/bin/`
 
 alternatively, binaries are included [here](<https://github.com/suwuako/c_ube/tree/main/binaries>)
